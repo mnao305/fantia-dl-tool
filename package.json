@@ -1,7 +1,7 @@
 {
-  "name": "webextension-typescript-template",
+  "name": "fantia-img-dl-tool",
   "version": "0.0.1",
-  "description": "webextension typescript template",
+  "description": "Fantiaの投稿の画像を一括DLするツール",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode=production",
