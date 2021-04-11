@@ -1,5 +1,7 @@
 import { browser } from 'webextension-polyfill-ts'
 import ky from 'ky'
+import JSZIP from 'jszip'
+import sanitize from 'sanitize-filename'
 
 interface postContentPhoto {
   'id': number
@@ -98,14 +100,60 @@ const fetchPostData = async () => {
 }
 
 const getImgList = (data: postData, cnt: number) => {
-  const ary: string[] = []
+  const ary = []
   const photoContents = data.post_contents.filter(v => v.category === 'photo_gallery')[cnt].post_content_photos
 
   for (let i = 0; i < photoContents.length; i++) {
-    ary.push(photoContents[i].url.original)
+    ary.push({ name: photoContents[i].id, url: photoContents[i].url.original })
   }
 
   return ary
+}
+
+interface imgData {
+  name: number
+  url: string
+}
+
+const mimeToExtension = (mime: string) => {
+  const mimeExtension: {[index: string]: string} = {
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+  }
+  return mimeExtension[mime]
+}
+
+const getImgListContents = async (urls: imgData[]) => {
+  const promises = urls.map(async url => {
+    const res = await ky.get(url.url)
+    const content = await res.blob()
+
+    const name = String(url.name) + mimeToExtension(content.type)
+    return { name, content }
+  })
+
+  const pairs = []
+
+  for (const promise of promises) {
+    pairs.push(await promise)
+  }
+
+  return pairs
+}
+
+interface ImgContents {
+  name: string;
+  content: Blob;
+}
+
+const generateZip = (imgListContents: ImgContents[], name: string) => {
+  const zip = new JSZIP()
+  const folder = zip.folder(sanitize(name))
+  imgListContents.forEach(content => {
+    folder!.file(sanitize(content.name), content.content)
+  })
+  return zip.generateAsync({ type: 'blob' })
 }
 
 const saveImages = async (event: MouseEvent) => {
@@ -114,6 +162,18 @@ const saveImages = async (event: MouseEvent) => {
   const data = await fetchPostData()
   const imgList = getImgList(data.post, Number(btnCount.value))
   console.log(imgList)
+  const imgListContents = await getImgListContents(imgList)
+  const name = `${data.post.id}_${btnCount.value}`
+  const zip = await generateZip(imgListContents, name)
+
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(zip)
+  a.download = `${name}.zip`
+
+  a.style.display = 'none'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 }
 
 let num = 0
