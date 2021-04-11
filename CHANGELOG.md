@@ -1,0 +1,14 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### 0.0.1 (2021-04-11)
+
+
+### Features
+
+* ダウンロード機能実装 ([1659d72](https://github.com/mnao305/webextension-typescript-template/commit/1659d72666d33a59e4508c1fd146b60a95949722))
+* データのフェッチ ([e9208eb](https://github.com/mnao305/webextension-typescript-template/commit/e9208ebaa562b50eacd2ab5d477f9af35fe826a1))
+* ボタンを埋め込む ([b5a3110](https://github.com/mnao305/webextension-typescript-template/commit/b5a3110f13ff145e717d87403117d6ad1b0e5168))
+* ボタン位置の変更 ([ede42aa](https://github.com/mnao305/webextension-typescript-template/commit/ede42aa065517adbf8b0b89ba46449be7088c7b0))
+* 画像のURLリストの取得 ([15f0bc5](https://github.com/mnao305/webextension-typescript-template/commit/15f0bc5a719397980846ccef9154030018b16925))
