@@ -1,8 +1,17 @@
 import { browser } from 'webextension-polyfill-ts'
+import ky from 'ky'
+
+const fetchPostData = async () => {
+  const id = location.pathname.split('/posts/')[1]
+  const json = await ky.get(`https://fantia.jp/api/v1/posts/${id}`).json()
+
+  console.log(json)
+}
 
 const btnCreate = () => {
   const btn = document.createElement('button')
   btn.textContent = 'Save'
+  btn.onclick = fetchPostData
   return btn
 }
 
