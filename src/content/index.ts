@@ -10,15 +10,15 @@ const fetchPostData = async () => {
 
 const btnCreate = () => {
   const btn = document.createElement('button')
-  btn.textContent = 'Save'
+  btn.textContent = '一括DL'
+  btn.setAttribute('style', 'display: block;margin: 20px auto;')
   btn.onclick = fetchPostData
   return btn
 }
 
-const injectBtn = () => {
+const injectBtn = (el: HTMLElement) => {
   const btn = btnCreate()
-  const el = document.getElementsByClassName('post-btns')
-  el[0].appendChild(btn)
+  el.appendChild(btn)
 }
 
 const main = () => {
@@ -26,8 +26,8 @@ const main = () => {
   if (!target) return
   const observer = new MutationObserver((mutations) => {
     mutations.forEach(mutation => {
-      if ((mutation.target as HTMLElement).className === 'post-btns' && (mutation.addedNodes[0] as HTMLElement).nodeName === 'POST-LIKE-BUTTON') {
-        injectBtn()
+      if ((mutation.target as HTMLElement).className === 'content-block type-photo-gallery ng-scope') {
+        injectBtn((mutation.target as HTMLElement))
         observer.disconnect()
       }
     })
@@ -40,10 +40,5 @@ const main = () => {
   }
 
   observer.observe(target, config)
-
-  window.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded')
-    injectBtn()
-  })
 }
 main()
