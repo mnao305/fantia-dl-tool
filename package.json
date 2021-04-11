@@ -25,6 +25,7 @@
     "commitizen": "^4.0.3",
     "jszip": "^3.6.0",
     "ky": "^0.27.0",
+    "sanitize-filename": "^1.6.3",
     "webextension-polyfill-ts": "^0.14.0"
   },
   "devDependencies": {
