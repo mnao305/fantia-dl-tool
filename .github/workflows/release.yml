@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+      - master
+name: release-please
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v2
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
+      # The logic below handles the npm publication:
+      - uses: actions/checkout@v2
+        # these if statements ensure that a publication only occurs when
+        # a new release is created:
+        if: ${{ steps.release.outputs.release_created }}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          registry-url: 'https://registry.npmjs.org'
+        if: ${{ steps.release.outputs.release_created }}
+      # if you are using Yarn, substitute the command below with `yarn install --frozen-lockfile`
+      - run: npm ci
+        if: ${{ steps.release.outputs.release_created }}
+      - run: npm run build
+        if: ${{ steps.release.outputs.release_created }}
+      - run: npm run zip
+        if: ${{ steps.release.outputs.release_created }}
+      # TODO GitHub Releseにファイルをアップロードする処理を差し込む
+      - name: Upload & release
+        uses: mnao305/chrome-extension-upload@1.1.0
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          file-path: dist_zip/*.zip
+          extension-id: poaolllddjlbbomnohpahbpdlcklkffi
+          client-id: ${{ secrets.CLIENT_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+          refresh-token: ${{ secrets.REFRESH_TOKEN }}
+          glob: true
