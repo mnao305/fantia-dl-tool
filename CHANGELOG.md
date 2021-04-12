@@ -20,14 +20,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 * 不要なmanifestの記述を削除 ([6e1a971](https://www.github.com/mnao305/fantia-img-dl-tool/commit/6e1a971fd180ffcb2b268375d7f264b8e05bf98d))
 
-## [1.0.0](https://github.com/mnao305/webextension-typescript-template/compare/v0.0.1...v1.0.0) (2021-04-12)
-
-
-### Features
-
-* アイコン追加 ([d619e8c](https://github.com/mnao305/webextension-typescript-template/commit/d619e8c83f7d7797af344715535e4a36e707cb7e))
-* ボタンのCSS変更 ([3d475c0](https://github.com/mnao305/webextension-typescript-template/commit/3d475c028d1abd63acf007a825a1bf33a8001486))
-
 ### 0.0.1 (2021-04-11)
 
 
