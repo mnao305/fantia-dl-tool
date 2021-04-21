@@ -1,0 +1,19 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 14
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - name: npm install
+      run: npm ci
+    - name: npm run build
+      run: npm run build
+    - name: npm run zip
+      run: npm run zip
