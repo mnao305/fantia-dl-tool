@@ -31,7 +31,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
       # TODO GitHub Releseにファイルをアップロードする処理を差し込む
       - name: Upload & release
-        uses: mnao305/chrome-extension-upload@1.1.0
+        uses: mnao305/chrome-extension-upload@1.1.1
         if: ${{ steps.release.outputs.release_created }}
         with:
           file-path: dist_zip/*.zip
