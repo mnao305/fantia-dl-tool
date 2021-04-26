@@ -52,7 +52,9 @@ const generateZip = (imgListContents: ImgContents[], name: string) => {
   const zip = new JSZIP()
   const folder = zip.folder(sanitize(name))
   imgListContents.forEach(content => {
-    folder!.file(sanitize(content.name), content.content)
+    if (folder) {
+      folder.file(sanitize(content.name), content.content)
+    }
   })
   return zip.generateAsync({ type: 'blob' })
 }
