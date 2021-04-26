@@ -64,7 +64,6 @@ const saveImages = async (event: MouseEvent) => {
   if (!btnCount) return
   const data = await fetchPostData()
   const imgList = getImgList(data.post, Number(btnCount.value))
-  console.log(imgList)
   const imgListContents = await getImgListContents(imgList)
   const name = `${data.post.id}_${btnCount.value}`
   const zip = await generateZip(imgListContents, name)
