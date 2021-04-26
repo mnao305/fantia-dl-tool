@@ -1,105 +1,16 @@
-import { browser } from 'webextension-polyfill-ts'
-import ky from 'ky'
 import JSZIP from 'jszip'
+import ky from 'ky'
 import sanitize from 'sanitize-filename'
-
-interface postContentPhoto {
-  'id': number
-  'url': {
-    'thumb': string
-    'medium': string
-    'large': string
-    'main': string
-    'original': string
-  }
-  'comment': null
-  'show_original_uri': string
-  'is_converted': boolean
-}
-
-interface postContent {
-  'id': number
-  'title': null
-  'visible_status': string
-  'published_state': string
-  'category': string
-  'comment': null
-  'embed_url': null
-  'content_type': null
-  'comments': unknown
-  'comments_reactions': unknown
-  'embed_api_url': string
-  'reactions': unknown
-  'reaction_types_url': string
-  'post_content_photos': postContentPhoto[]
-  'post_content_photos_micro': string[]
-  'plan': unknown
-  'product': null
-  'onsale_backnumber': false
-  'backnumber_link': null
-  'join_status': null
-  'parent_post': unknown
-}
-
-interface postData {
-  'id': number
-  'title': string
-  'comment': string
-  'rating': string
-  'thumb': {
-    thumb: string
-    medium: string
-    large: string
-    main: string
-    ogp: string
-    micro: string
-    original: string
-  }
-  'thumb_micro': string
-  'show_adult_thumb': boolean
-  'posted_at': string
-  'likes_count': number
-  'liked': boolean
-  'is_contributor': boolean
-  'uri': {
-    'show': string
-    'edit': null
-  }
-  'is_pulish_open': boolean
-  'is_blog': boolean
-  'converted_at': string
-  'fanclub_brand': number
-  'special_reaction': null
-  'redirect_url_from_save': string
-  'fanclub': unknown
-  'tags': []
-  'status': 'open'
-  'post_contents': postContent[]
-  'deadline': string
-  'publish_reserved_at': null
-  'comments': unknown
-  'blog_comment': ''
-  'comments_reactions': unknown
-  'reactions': unknown
-  'reaction_types_url': string
-  'ogp_api_url': string
-  'links': unknown
-  'is_fanclub_tip_accept': boolean
-  'is_fanclub_joined': boolean
-}
-
-interface postDataResponse {
-  post: postData
-}
+import { ImgContents, ImgData, PostData, PostDataResponse } from '../types/index'
 
 const fetchPostData = async () => {
   const id = location.pathname.split('/posts/')[1]
-  const json = await ky.get(`https://fantia.jp/api/v1/posts/${id}`).json<postDataResponse>()
+  const json = await ky.get(`https://fantia.jp/api/v1/posts/${id}`).json<PostDataResponse>()
 
   return json
 }
 
-const getImgList = (data: postData, cnt: number) => {
+const getImgList = (data: PostData, cnt: number) => {
   const ary = []
   const photoContents = data.post_contents.filter(v => v.category === 'photo_gallery')[cnt].post_content_photos
 
@@ -108,11 +19,6 @@ const getImgList = (data: postData, cnt: number) => {
   }
 
   return ary
-}
-
-interface imgData {
-  name: number
-  url: string
 }
 
 const mimeToExtension = (mime: string) => {
@@ -124,7 +30,7 @@ const mimeToExtension = (mime: string) => {
   return mimeExtension[mime]
 }
 
-const getImgListContents = async (urls: imgData[]) => {
+const getImgListContents = async (urls: ImgData[]) => {
   const promises = urls.map(async url => {
     const res = await ky.get(url.url)
     const content = await res.blob()
@@ -142,16 +48,13 @@ const getImgListContents = async (urls: imgData[]) => {
   return pairs
 }
 
-interface ImgContents {
-  name: string;
-  content: Blob;
-}
-
 const generateZip = (imgListContents: ImgContents[], name: string) => {
   const zip = new JSZIP()
   const folder = zip.folder(sanitize(name))
   imgListContents.forEach(content => {
-    folder!.file(sanitize(content.name), content.content)
+    if (folder) {
+      folder.file(sanitize(content.name), content.content)
+    }
   })
   return zip.generateAsync({ type: 'blob' })
 }
@@ -161,7 +64,6 @@ const saveImages = async (event: MouseEvent) => {
   if (!btnCount) return
   const data = await fetchPostData()
   const imgList = getImgList(data.post, Number(btnCount.value))
-  console.log(imgList)
   const imgListContents = await getImgListContents(imgList)
   const name = `${data.post.id}_${btnCount.value}`
   const zip = await generateZip(imgListContents, name)
