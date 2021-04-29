@@ -1,4 +1,6 @@
-# fantia-img-dl-tool
+# fantia-dl-tool
+
+(旧名: fantia-img-dl-tool)
 
 ## これは何
 
@@ -14,7 +16,7 @@ Fantiaの投稿の画像をzipで一括DLできるブラウザ拡張機能です
 
 下記リンクからブラウザ拡張機能を追加してください。
 
-<https://chrome.google.com/webstore/detail/fantia-img-dl-tool/poaolllddjlbbomnohpahbpdlcklkffi>
+<https://chrome.google.com/webstore/detail/fantia-dl-tool/poaolllddjlbbomnohpahbpdlcklkffi>
 
 ## 免責事項
 
