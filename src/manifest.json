@@ -9,8 +9,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://fantia.jp/posts/*"],
-      "js": ["content/index.js"]
+      "matches": [
+        "https://fantia.jp/posts/*",
+        "https://fantia.jp/fanclubs/*/backnumbers*"
+      ],
+      "js": [
+        "content/index.js"
+      ]
     }
   ],
   "permissions": []

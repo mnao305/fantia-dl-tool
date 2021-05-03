@@ -1,4 +1,4 @@
-interface PostContentPhoto {
+export interface PostContentPhoto {
   'id': number
   'url': {
     'thumb': string
