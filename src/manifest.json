@@ -11,7 +11,7 @@
     {
       "matches": [
         "https://fantia.jp/posts/*",
-        "https://fantia.jp/fanclubs/*/backnumbers"
+        "https://fantia.jp/fanclubs/*/backnumbers*"
       ],
       "js": [
         "content/index.js"
