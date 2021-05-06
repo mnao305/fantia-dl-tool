@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v1.0.0...v2.0.0) (2021-05-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* * feat: バックナンバーページでも画像の一括DLが可能になった
+
+### Features
+
+* バックナンバーページでも画像の一括DLが可能になった ([#48](https://www.github.com/mnao305/fantia-dl-tool/issues/48)) ([6b91f61](https://www.github.com/mnao305/fantia-dl-tool/commit/6b91f61e63707629c21a4fd3dfbae8e7d0b00580))
+
+
+### Bug Fixes
+
+* **deps:** update dependency commitizen to v4.2.3 ([280ffab](https://www.github.com/mnao305/fantia-dl-tool/commit/280ffab122278f22f21a5db319463f4e81cfc48d))
+* **deps:** update dependency webextension-polyfill-ts to v0.25.0 ([f285711](https://www.github.com/mnao305/fantia-dl-tool/commit/f285711e2ebbd705e407a05d6fee8d4cd3a1acc8))
+
 ## 1.0.0 (2021-04-12)
 
 ### Features
