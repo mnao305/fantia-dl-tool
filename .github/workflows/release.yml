@@ -12,26 +12,3 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
-      - uses: actions/checkout@v2
-        if: ${{ steps.release.outputs.release_created }}
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
-        if: ${{ steps.release.outputs.release_created }}
-      - run: npm ci
-        if: ${{ steps.release.outputs.release_created }}
-      - run: npm run build
-        if: ${{ steps.release.outputs.release_created }}
-      - run: npm run zip
-        if: ${{ steps.release.outputs.release_created }}
-      # TODO GitHub Releseにファイルをアップロードする処理を差し込む
-      - name: Upload & release
-        uses: mnao305/chrome-extension-upload@1.1.1
-        if: ${{ steps.release.outputs.release_created }}
-        with:
-          file-path: dist_zip/*.zip
-          extension-id: poaolllddjlbbomnohpahbpdlcklkffi
-          client-id: ${{ secrets.CLIENT_ID }}
-          client-secret: ${{ secrets.CLIENT_SECRET }}
-          refresh-token: ${{ secrets.REFRESH_TOKEN }}
-          glob: true
