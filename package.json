@@ -39,7 +39,7 @@
     "copy-webpack-plugin": "5.1.2",
     "cz-conventional-changelog": "3.3.0",
     "cz-customizable": "6.3.0",
-    "eslint": "7.25.0",
+    "eslint": "7.26.0",
     "husky": "6.0.0",
     "ts-loader": "6.2.2",
     "ts-node": "9.1.1",
