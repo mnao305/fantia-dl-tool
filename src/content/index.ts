@@ -20,16 +20,16 @@ const fetchBacknumberData = async () => {
   return json.backnumber
 }
 
-const getImgList = (data: PostData | Backnumber, cnt: number) => {
+const getImgList = (data: PostData | Backnumber, contentId: number) => {
   const ary = []
   if ('post_contents' in data) {
-    const photoContents = data.post_contents.filter(v => v.category === 'photo_gallery')[cnt].post_content_photos
+    const photoContents = data.post_contents.filter(v => v.id === contentId)[0].post_content_photos
 
     for (let i = 0; i < photoContents.length; i++) {
       ary.push({ name: photoContents[i].id, url: photoContents[i].url.original })
     }
   } else if ('backnumber_contents' in data) {
-    const photoContents = data.backnumber_contents.filter(v => v.category === 'photo_gallery')[cnt].post_content_photos
+    const photoContents = data.backnumber_contents.filter(v => v.id === contentId)[0].post_content_photos
 
     for (let i = 0; i < photoContents.length; i++) {
       ary.push({ name: photoContents[i].id, url: photoContents[i].url.original })
@@ -77,25 +77,16 @@ const generateZip = (imgListContents: ImgContents[], name: string) => {
   return zip.generateAsync({ type: 'blob' })
 }
 
-const getId = (data: PostData | Backnumber, cnt: number) => {
-  if ('post_contents' in data) {
-    return data.post_contents.filter(v => v.category === 'photo_gallery')[cnt].id
-  } else if ('backnumber_contents' in data) {
-    return data.backnumber_contents.filter(v => v.category === 'photo_gallery')[cnt].id
-  }
-  return 0
-}
-
 const saveImages = async (event: MouseEvent) => {
-  const btnCount = (event.target as HTMLElement).attributes.getNamedItem('gallery-count')
-  if (!btnCount) return
+  const contentId = (event.target as HTMLElement).attributes.getNamedItem('content-id')
+  if (!contentId) return
   const data = /.+\/backnumbers.*/.test(location.href)
     ? await fetchBacknumberData()
     : await fetchPostData()
 
-  const imgList = getImgList(data, Number(btnCount.value))
+  const imgList = getImgList(data, Number(contentId.value))
   const imgListContents = await getImgListContents(imgList)
-  const name = String(getId(data, Number(btnCount.value)))
+  const name = contentId.value
   const zip = await generateZip(imgListContents, name)
 
   const a = document.createElement('a')
@@ -108,21 +99,22 @@ const saveImages = async (event: MouseEvent) => {
   document.body.removeChild(a)
 }
 
-let num = 0
-
-const btnCreate = () => {
+const btnCreate = (contentId: string) => {
   const btn = document.createElement('button')
   btn.textContent = '一括DL'
   btn.setAttribute('style', 'display: block;margin: 20px auto;padding: 20px 40px;background-color: #22c283;border: none;color: #fff;border-radius: 10px;')
-  btn.setAttribute('gallery-count', String(num))
-  num++
+  btn.setAttribute('content-id', contentId)
   btn.onclick = saveImages
   return btn
 }
 
-const injectBtn = (el: HTMLElement) => {
-  const btn = btnCreate()
+const injectBtn = (el: HTMLElement, contentId: string) => {
+  const btn = btnCreate(contentId)
   el.appendChild(btn)
+}
+
+const elementIdTocontentId = (id: string) => {
+  return id.split('post-content-id-')[1]
 }
 
 const main = () => {
@@ -131,8 +123,12 @@ const main = () => {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach(mutation => {
       if ((mutation.target as HTMLElement).className === 'content-block type-photo-gallery ng-scope') {
-        injectBtn((mutation.target as HTMLElement))
-        observer.disconnect()
+        const elId = (mutation.target as HTMLElement).closest('.post-content-inner')?.id
+        if (elId) {
+          const contentId = elementIdTocontentId(elId)
+          injectBtn((mutation.target as HTMLElement), contentId)
+          observer.disconnect()
+        }
       }
     })
   })
