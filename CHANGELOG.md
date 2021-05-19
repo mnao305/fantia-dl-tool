@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://www.github.com/mnao305/fantia-dl-tool/compare/v2.0.0...v2.0.1) (2021-05-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency commitizen to v4.2.4 ([42ede51](https://www.github.com/mnao305/fantia-dl-tool/commit/42ede5149e89b8c4666d17b8d69117f30ee77cf0))
+* 一括ボタンが正常に機能しない可能性があったのを修正 ([#63](https://www.github.com/mnao305/fantia-dl-tool/issues/63)) ([95202e2](https://www.github.com/mnao305/fantia-dl-tool/commit/95202e2087cf7904b28287106d874eb0780f1c1c)), closes [#62](https://www.github.com/mnao305/fantia-dl-tool/issues/62)
+
 ## [2.0.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v1.0.0...v2.0.0) (2021-05-03)
 
 

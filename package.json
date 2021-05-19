@@ -1,6 +1,6 @@
 {
   "name": "fantia-dl-tool",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Fantiaの投稿の画像を一括DLするツール",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
