@@ -30,7 +30,7 @@ export interface BacknumberContents {
   'published_state': string
   'reaction_types_url': string
   reactions: unknown
-  title: null
+  title: null | string
   'visible_status': string
 }
 

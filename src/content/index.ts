@@ -1,4 +1,5 @@
 import { browser } from 'webextension-polyfill-ts'
+import { PostData } from '../types'
 import { Backnumber } from '../types/backnumber'
 import { fetchBacknumberData } from './modules/backnumberPage'
 import { injectBtn } from './modules/dom'
@@ -20,8 +21,14 @@ const backnumberToPostIdAndTitle = (data: Backnumber, contentId: number) => {
   return `${backnumberContents.parent_post.url.split('/').pop()}_${backnumberContents.parent_post.title}`
 }
 
-const contentIdToTitle = () => {
-  // TODO contentごとのタイトルを取得する
+const contentIdToTitle = (data: PostData | Backnumber, contentId: number) => {
+  if ('post_contents' in data) {
+    const content = data.post_contents.filter(v => v.id === contentId)[0]
+    return content.title == null ? '' : `_${content.title}`
+  } else if ('backnumber_contents' in data) {
+    const content = data.backnumber_contents.filter(v => v.id === contentId)[0]
+    return content.title == null ? '' : `_${content.title}`
+  }
 }
 
 export const saveImages = async (event: MouseEvent): Promise<void> => {
@@ -31,11 +38,10 @@ export const saveImages = async (event: MouseEvent): Promise<void> => {
   const data = /.+\/backnumbers.*/.test(location.href)
     ? await fetchBacknumberData()
     : await fetchPostData()
-  console.log(contentId)
 
   const filepath = 'post_contents' in data
-    ? `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${data.id}_${data.title}/${contentId}`
-    : `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${contentId}`
+    ? `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${data.id}_${data.title}/${contentId}${contentIdToTitle(data, Number(contentId))}`
+    : `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${contentId}${contentIdToTitle(data, Number(contentId))}`
 
   const imgList = getImgList(data, Number(contentId))
   for (let i = 0; i < imgList.length; i++) {

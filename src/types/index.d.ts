@@ -44,7 +44,7 @@ export interface PostContentPhoto {
 
 interface PostContent {
   'id': number
-  'title': null
+  'title': null | string
   'visible_status': string
   'published_state': string
   'category': string
