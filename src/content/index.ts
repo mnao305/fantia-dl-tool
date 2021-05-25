@@ -8,10 +8,10 @@ import { fetchPostData } from './modules/postPage'
 
 const urlToExt = (url: string): string => {
   const matchedFileName = url.match(/^(?:[^:/?#]+:)?(?:\/\/[^/?#]*)?(?:([^?#]*\/)([^/?#]*))?(\?[^#]*)?(?:#.*)?$/) ?? []
-  const [, dir, fileName, query] = matchedFileName.map(match => match ?? '')
+  const [, , fileName] = matchedFileName.map(match => match ?? '')
 
   const matchedExt = fileName.match(/^(.+?)(\.[^.]+)?$/) ?? []
-  const [, name, ext] = matchedExt.map(match => match ?? '')
+  const [, , ext] = matchedExt.map(match => match ?? '')
 
   return ext
 }
