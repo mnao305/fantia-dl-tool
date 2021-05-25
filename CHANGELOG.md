@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v2.0.1...v3.0.0) (2021-05-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* * feat: 保存形式を階層構造のフォルダに直接ダウンロードするように変更
+
+### Features
+
+* 保存形式を階層構造のフォルダに直接ダウンロードするように変更 ([#70](https://www.github.com/mnao305/fantia-dl-tool/issues/70)) ([c1f68d2](https://www.github.com/mnao305/fantia-dl-tool/commit/c1f68d2c3339cf471e63397c933826e345faec91))
+
 ### [2.0.1](https://www.github.com/mnao305/fantia-dl-tool/compare/v2.0.0...v2.0.1) (2021-05-19)
 
 
