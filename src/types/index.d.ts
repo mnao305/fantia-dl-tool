@@ -1,3 +1,33 @@
+export interface Fanclub {
+  category: unknown
+  cover: unknown
+  'creator_name': string
+  'fan_count': number
+  'fanclub_name': string
+  'fanclub_name_or_creator_name': string
+  'fanclub_name_with_creator_name': string
+  icon: unknown
+  id: number
+  'is_blocked': boolean
+  'is_join': boolean
+  name: string
+  plans: unknown
+  'posts_count': number
+  'products_count': number
+  'recent_posts': unknown
+  'recent_products': unknown
+  title: string
+  uri: unknown
+  user:unknown
+}
+
+export interface ParentPost {
+  date: string
+  deadline: string
+  title: string
+  url: string
+}
+
 export interface PostContentPhoto {
   'id': number
   'url': {
@@ -33,7 +63,7 @@ interface PostContent {
   'onsale_backnumber': false
   'backnumber_link': null
   'join_status': null
-  'parent_post': unknown
+  'parent_post': ParentPost
 }
 
 export interface PostData {
@@ -66,7 +96,7 @@ export interface PostData {
   'fanclub_brand': number
   'special_reaction': null
   'redirect_url_from_save': string
-  'fanclub': unknown
+  'fanclub': Fanclub
   'tags': []
   'status': 'open'
   'post_contents': PostContent[]

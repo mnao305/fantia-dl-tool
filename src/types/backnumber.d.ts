@@ -1,5 +1,5 @@
 // eslint-disable-next-line semi
-import { PostContentPhoto } from './index';
+import { Fanclub, ParentPost, PostContentPhoto } from './index';
 
 export interface Plan {
   description: string
@@ -11,7 +11,7 @@ export interface Plan {
 }
 
 export interface BacknumberContents {
-  'backnumber_link': '/fanclubs/126510/backnumbers?month=202103&plan=189964'
+  'backnumber_link': string
   category: string
   comment: null
   comments: unknown
@@ -22,7 +22,7 @@ export interface BacknumberContents {
   id: number
   'join_status': string
   'onsale_backnumber': string
-  'parent_post': unknown
+  'parent_post': ParentPost
   plan: Plan
   'post_content_photos': PostContentPhoto[]
   'post_content_photos_micro': []
@@ -38,7 +38,7 @@ export interface Backnumber {
   'backnumber_contents': BacknumberContents[]
   comment: string
   'converted_at': string
-  fanclub: unknown
+  fanclub: Fanclub
   'fanclub_brand': number
   id: number
   'is_blog': boolean

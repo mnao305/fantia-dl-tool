@@ -1,43 +1,55 @@
-import JSZIP from 'jszip'
-import sanitize from 'sanitize-filename'
-import { ImgContents } from '../types/index'
+import { browser } from 'webextension-polyfill-ts'
+import { Backnumber } from '../types/backnumber'
 import { fetchBacknumberData } from './modules/backnumberPage'
 import { injectBtn } from './modules/dom'
-import { getImgList, getImgListContents } from './modules/img'
+import { getImgList } from './modules/img'
 import { fetchPostData } from './modules/postPage'
 
-// TODO 削除予定
-const generateZip = (imgListContents: ImgContents[], name: string) => {
-  const zip = new JSZIP()
-  const folder = zip.folder(sanitize(name))
-  imgListContents.forEach(content => {
-    if (folder) {
-      folder.file(sanitize(content.name), content.content)
-    }
-  })
-  return zip.generateAsync({ type: 'blob' })
+const urlToExt = (url: string): string => {
+  const matchedFileName = url.match(/^(?:[^:/?#]+:)?(?:\/\/[^/?#]*)?(?:([^?#]*\/)([^/?#]*))?(\?[^#]*)?(?:#.*)?$/) ?? []
+  const [, dir, fileName, query] = matchedFileName.map(match => match ?? '')
+
+  const matchedExt = fileName.match(/^(.+?)(\.[^.]+)?$/) ?? []
+  const [, name, ext] = matchedExt.map(match => match ?? '')
+
+  return ext
+}
+
+const backnumberToPostIdAndTitle = (data: Backnumber, contentId: number) => {
+  const backnumberContents = data.backnumber_contents.filter(v => v.id === contentId)[0]
+  return `${backnumberContents.parent_post.url.split('/').pop()}_${backnumberContents.parent_post.title}`
+}
+
+const contentIdToTitle = () => {
+  // TODO contentごとのタイトルを取得する
 }
 
 export const saveImages = async (event: MouseEvent): Promise<void> => {
-  const contentId = (event.target as HTMLElement).attributes.getNamedItem('content-id')
-  if (!contentId) return
+  const contentIdAttr = (event.target as HTMLElement).attributes.getNamedItem('content-id')
+  if (!contentIdAttr) return
+  const contentId = contentIdAttr.value
   const data = /.+\/backnumbers.*/.test(location.href)
     ? await fetchBacknumberData()
     : await fetchPostData()
+  console.log(contentId)
 
-  const imgList = getImgList(data, Number(contentId.value))
-  const imgListContents = await getImgListContents(imgList)
-  const name = contentId.value
-  const zip = await generateZip(imgListContents, name)
+  const filepath = 'post_contents' in data
+    ? `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${data.id}_${data.title}/${contentId}`
+    : `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${contentId}`
 
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(zip)
-  a.download = `${name}.zip`
+  const imgList = getImgList(data, Number(contentId))
+  for (let i = 0; i < imgList.length; i++) {
+    const url = imgList[i].url
+    const filename = imgList[i].name + urlToExt(url)
+    const sendData = {
+      msg: 'download',
+      url: url,
+      filepath: filepath,
+      filename: filename,
+    }
 
-  a.style.display = 'none'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+    browser.runtime.sendMessage(sendData)
+  }
 }
 
 const elementIdTocontentId = (id: string) => {

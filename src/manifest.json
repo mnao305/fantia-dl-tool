@@ -18,5 +18,13 @@
       ]
     }
   ],
-  "permissions": []
+  "background": {
+    "scripts": [
+      "background/index.js"
+    ],
+    "persistent": false
+  },
+  "permissions": [
+    "downloads"
+  ]
 }
