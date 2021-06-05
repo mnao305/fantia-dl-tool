@@ -1,3 +1,4 @@
+import sanitize from 'sanitize-filename'
 import { browser } from 'webextension-polyfill-ts'
 import { PostData } from '../types'
 import { Backnumber } from '../types/backnumber'
@@ -5,7 +6,6 @@ import { fetchBacknumberData } from './modules/backnumberPage'
 import { injectBtn } from './modules/dom'
 import { getImgList } from './modules/img'
 import { fetchPostData } from './modules/postPage'
-
 const urlToExt = (url: string): string => {
   const matchedFileName = url.match(/^(?:[^:/?#]+:)?(?:\/\/[^/?#]*)?(?:([^?#]*\/)([^/?#]*))?(\?[^#]*)?(?:#.*)?$/) ?? []
   const [, , fileName] = matchedFileName.map(match => match ?? '')
@@ -18,16 +18,22 @@ const urlToExt = (url: string): string => {
 
 const backnumberToPostIdAndTitle = (data: Backnumber, contentId: number) => {
   const backnumberContents = data.backnumber_contents.filter(v => v.id === contentId)[0]
-  return `${backnumberContents.parent_post.url.split('/').pop()}_${backnumberContents.parent_post.title}`
+  return sanitize(`${backnumberContents.parent_post.url.split('/').pop()}_${backnumberContents.parent_post.title}`)
+}
+
+const idAndTitlePath = (id: number | string, title: string) => {
+  return title !== '' ? sanitize(`${id}_${title}`) : sanitize(`${id}`)
 }
 
 const contentIdToTitle = (data: PostData | Backnumber, contentId: number) => {
   if ('post_contents' in data) {
     const content = data.post_contents.filter(v => v.id === contentId)[0]
-    return content.title == null ? '' : `_${content.title}`
+    return content.title == null ? '' : `${content.title}`
   } else if ('backnumber_contents' in data) {
     const content = data.backnumber_contents.filter(v => v.id === contentId)[0]
-    return content.title == null ? '' : `_${content.title}`
+    return content.title == null ? '' : `${content.title}`
+  } else {
+    return ''
   }
 }
 
@@ -40,8 +46,8 @@ export const saveImages = async (event: MouseEvent): Promise<void> => {
     : await fetchPostData()
 
   const filepath = 'post_contents' in data
-    ? `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${data.id}_${data.title}/${contentId}${contentIdToTitle(data, Number(contentId))}`
-    : `${data.fanclub.id}_${data.fanclub.fanclub_name_with_creator_name}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${contentId}${contentIdToTitle(data, Number(contentId))}`
+    ? `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
+    : `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
 
   const imgList = getImgList(data, Number(contentId))
   for (let i = 0; i < imgList.length; i++) {
