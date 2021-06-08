@@ -1,6 +1,6 @@
 {
   "name": "",
-  "description": "",
+  "description": "__MSG_description__",
   "version": null,
   "manifest_version": 2,
   "default_locale": "en",
