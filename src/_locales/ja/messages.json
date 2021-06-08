@@ -1,0 +1,8 @@
+{
+  "description": {
+    "message": "Fantiaの投稿のメディアを全て一括でDLするツール"
+  },
+  "download_all": {
+    "message": "一括DL"
+  }
+}

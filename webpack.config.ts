@@ -1,7 +1,7 @@
 import path from 'path'
-import { ConfigurationFactory } from 'webpack'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
-import { version, name, description } from './package.json'
+import { ConfigurationFactory } from 'webpack'
+import { description, name, version } from './package.json'
 
 const config: ConfigurationFactory = (_, argv) => {
   return {
@@ -43,12 +43,11 @@ const config: ConfigurationFactory = (_, argv) => {
             const jsonContent = JSON.parse(content.toString())
             jsonContent.version = version
             jsonContent.name = name
-            jsonContent.description = description
 
             return JSON.stringify(jsonContent, null, 2)
           },
         },
-        // { from: '_locales', to: '_locales' } //多言語化対応用
+        { from: '_locales', to: '_locales' },
       ]),
     ],
   }
