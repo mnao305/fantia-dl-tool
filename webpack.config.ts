@@ -43,7 +43,6 @@ const config: ConfigurationFactory = (_, argv) => {
             const jsonContent = JSON.parse(content.toString())
             jsonContent.version = version
             jsonContent.name = name
-            jsonContent.description = description
 
             return JSON.stringify(jsonContent, null, 2)
           },
