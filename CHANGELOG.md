@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.1.0...v3.2.0) (2021-06-08)
+
+
+### Features
+
+* add a template for internationalization support. ([#94](https://www.github.com/mnao305/fantia-dl-tool/issues/94)) ([1f8bbea](https://www.github.com/mnao305/fantia-dl-tool/commit/1f8bbeaaad980d33b5501c27df82a5cfd9198b11))
+
+
+### Bug Fixes
+
+* **deps:** pin dependency sanitize-filename to 1.6.3 ([c0a9945](https://www.github.com/mnao305/fantia-dl-tool/commit/c0a994583cc55a31865959cc7351665d68e044ea))
+
 ## [3.1.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.0.0...v3.1.0) (2021-06-05)
 
 
