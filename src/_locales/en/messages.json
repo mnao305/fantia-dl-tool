@@ -1,0 +1,8 @@
+{
+  "description": {
+    "message": "A tool to batch DL all media for Fantia posts."
+  },
+  "download_all": {
+    "message": "Download All"
+  }
+}
