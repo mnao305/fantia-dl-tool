@@ -93,3 +93,13 @@ const main = () => {
   observer.observe(target, config)
 }
 main()
+
+// メッセージ受信で一括ダウンロード
+browser.runtime.onMessage.addListener(async (message, sender) => {
+  if (message.text === 'download_everything_from_a_post') {
+    // TODO: 投稿全体のダウンロードをする
+    console.log('Yeah!!!')
+    console.log(message)
+
+  }
+})
