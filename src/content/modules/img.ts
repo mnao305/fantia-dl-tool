@@ -36,8 +36,8 @@ export const mimeToExtension = (mime: string): string => {
 }
 
 interface ContentPair {
-    name: string
-    content: Blob
+  name: string
+  content: Blob
 }
 
 export const getImgListContents = async (urls: ImgData[]): Promise<ContentPair[]> => {

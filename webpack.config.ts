@@ -1,7 +1,7 @@
 import path from 'path'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import { ConfigurationFactory } from 'webpack'
-import { description, name, version } from './package.json'
+import { name, version } from './package.json'
 
 const config: ConfigurationFactory = (_, argv) => {
   return {
