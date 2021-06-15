@@ -1,28 +1,27 @@
 import ky from 'ky'
 import { Backnumber } from '../../types/backnumber'
-import { ImgData, PostData } from '../../types/index'
+import { ImgData, PostContentPhoto, PostData } from '../../types/index'
 
 interface ImgPair {
   name: number
   url: string
 }
 
-export const getImgList = (data: PostData | Backnumber, contentId: number): ImgPair[] => {
-  const ary: ImgPair[] = []
+export const getPhotoContents = (data: PostData | Backnumber, contentId: number): PostContentPhoto[] => {
   if ('post_contents' in data) {
-    const photoContents = data.post_contents.filter(v => v.id === contentId)[0].post_content_photos
-
-    for (let i = 0; i < photoContents.length; i++) {
-      ary.push({ name: photoContents[i].id, url: photoContents[i].url.original })
-    }
+    return data.post_contents.filter(v => v.id === contentId)[0].post_content_photos
   } else if ('backnumber_contents' in data) {
-    const photoContents = data.backnumber_contents.filter(v => v.id === contentId)[0].post_content_photos
-
-    for (let i = 0; i < photoContents.length; i++) {
-      ary.push({ name: photoContents[i].id, url: photoContents[i].url.original })
-    }
+    return data.backnumber_contents.filter(v => v.id === contentId)[0].post_content_photos
+  } else {
+    return []
   }
+}
 
+export const getImgList = (photoContents: PostContentPhoto[]): ImgPair[] => {
+  const ary: ImgPair[] = []
+  for (let i = 0; i < photoContents.length; i++) {
+    ary.push({ name: photoContents[i].id, url: photoContents[i].url.original })
+  }
   return ary
 }
 
