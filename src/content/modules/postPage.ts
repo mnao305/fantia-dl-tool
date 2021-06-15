@@ -20,7 +20,7 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
     const contentId = postContent.id
     const filepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
 
-    if ('post_content_photos' in postContent) {
+    if (postContent.category === 'photo_gallery') {
       const imgList = getImgList(postContent.post_content_photos)
       for (let i = 0; i < imgList.length; i++) {
         const url = imgList[i].url
