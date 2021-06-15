@@ -11,6 +11,7 @@ export const fetchPostData = async (): Promise<PostData> => {
   return json.post
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const downloadEverythingFromPost = async (): Promise<void> => {
   const data = await fetchPostData()
@@ -23,6 +24,7 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
     if (postContent.category === 'photo_gallery') {
       const imgList = getImgList(postContent.post_content_photos)
       for (let i = 0; i < imgList.length; i++) {
+        if (i % 10 === 0) await sleep(500)
         const url = imgList[i].url
         const filename = imgList[i].name + urlToExt(url)
         const sendData = {
