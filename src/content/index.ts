@@ -4,9 +4,10 @@ import { PostData } from '../types'
 import { Backnumber } from '../types/backnumber'
 import { fetchBacknumberData } from './modules/backnumberPage'
 import { injectBtn } from './modules/dom'
-import { getImgList } from './modules/img'
-import { fetchPostData } from './modules/postPage'
-const urlToExt = (url: string): string => {
+import { getImgList, getPhotoContents } from './modules/img'
+import { downloadEverythingFromPost, fetchPostData } from './modules/postPage'
+
+export const urlToExt = (url: string): string => {
   const matchedFileName = url.match(/^(?:[^:/?#]+:)?(?:\/\/[^/?#]*)?(?:([^?#]*\/)([^/?#]*))?(\?[^#]*)?(?:#.*)?$/) ?? []
   const [, , fileName] = matchedFileName.map(match => match ?? '')
 
@@ -21,11 +22,11 @@ const backnumberToPostIdAndTitle = (data: Backnumber, contentId: number) => {
   return sanitize(`${backnumberContents.parent_post.url.split('/').pop()}_${backnumberContents.parent_post.title}`)
 }
 
-const idAndTitlePath = (id: number | string, title: string) => {
+export const idAndTitlePath = (id: number | string, title: string) => {
   return title !== '' ? sanitize(`${id}_${title}`) : sanitize(`${id}`)
 }
 
-const contentIdToTitle = (data: PostData | Backnumber, contentId: number) => {
+export const contentIdToTitle = (data: PostData | Backnumber, contentId: number) => {
   if ('post_contents' in data) {
     const content = data.post_contents.filter(v => v.id === contentId)[0]
     return content.title == null ? '' : `${content.title}`
@@ -49,7 +50,8 @@ export const saveImages = async (event: MouseEvent): Promise<void> => {
     ? `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
     : `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
 
-  const imgList = getImgList(data, Number(contentId))
+  const photoContents = getPhotoContents(data, Number(contentId))
+  const imgList = getImgList(photoContents)
   for (let i = 0; i < imgList.length; i++) {
     const url = imgList[i].url
     const filename = imgList[i].name + urlToExt(url)
@@ -98,6 +100,7 @@ main()
 browser.runtime.onMessage.addListener(async (message, sender) => {
   if (message.text === 'download_everything_from_a_post') {
     // TODO: 投稿全体のダウンロードをする
+    await downloadEverythingFromPost()
     console.log('Yeah!!!')
     console.log(message)
 
