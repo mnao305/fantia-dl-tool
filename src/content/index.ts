@@ -4,6 +4,7 @@ import { PostData } from '../types'
 import { Backnumber } from '../types/backnumber'
 import { fetchBacknumberData } from './modules/backnumberPage'
 import { injectBtn } from './modules/dom'
+import { fileDownload } from './modules/download'
 import { getImgList, getPhotoContents } from './modules/img'
 import { downloadEverythingFromPost, fetchPostData } from './modules/postPage'
 
@@ -55,14 +56,7 @@ export const saveImages = async (event: MouseEvent): Promise<void> => {
   for (let i = 0; i < imgList.length; i++) {
     const url = imgList[i].url
     const filename = imgList[i].name + urlToExt(url)
-    const sendData = {
-      msg: 'download',
-      url: url,
-      filepath: filepath,
-      filename: filename,
-    }
-
-    browser.runtime.sendMessage(sendData)
+    fileDownload(url, filepath, filename)
   }
 }
 

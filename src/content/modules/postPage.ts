@@ -1,8 +1,8 @@
 import ky from 'ky'
-import { browser } from 'webextension-polyfill-ts'
 import { idAndTitlePath, contentIdToTitle, urlToExt } from '../index'
 import { PostData, PostDataResponse } from '../../types/index'
 import { getImgList } from './img'
+import { fileDownload } from './download'
 
 export const fetchPostData = async (): Promise<PostData> => {
   const id = location.pathname.split('/posts/')[1]
@@ -27,13 +27,7 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
         if (i % 10 === 0) await sleep(500)
         const url = imgList[i].url
         const filename = imgList[i].name + urlToExt(url)
-        const sendData = {
-          msg: 'download',
-          url: url,
-          filepath: filepath,
-          filename: filename,
-        }
-        browser.runtime.sendMessage(sendData)
+        fileDownload(url, filepath, filename)
       }
     }
   }
