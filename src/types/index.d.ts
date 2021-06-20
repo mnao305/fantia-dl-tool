@@ -18,7 +18,7 @@ export interface Fanclub {
   'recent_products': unknown
   title: string
   uri: unknown
-  user:unknown
+  user: unknown
 }
 
 export interface ParentPost {
@@ -42,28 +42,43 @@ export interface PostContentPhoto {
   'is_converted': boolean
 }
 
+/** 全てのカテゴリで共通 */
 interface PostContent {
   'id': number
+  'category': string
   'title': null | string
   'visible_status': string
   'published_state': string
-  'category': string
-  'comment': null
+  'comment': null | string
+  'embed_api_url': string
   'embed_url': null
-  'content_type': null
+  'content_type': null | string
   'comments': unknown
   'comments_reactions': unknown
-  'embed_api_url': string
   'reactions': unknown
   'reaction_types_url': string
-  'post_content_photos': PostContentPhoto[]
   'post_content_photos_micro': string[]
   'plan': unknown
   'product': null
-  'onsale_backnumber': false
-  'backnumber_link': null
+  'onsale_backnumber': string
+  'backnumber_link': null | string
   'join_status': null
   'parent_post': ParentPost
+}
+
+interface PostContentPhotoGallery extends PostContent {
+  'category': 'photo_gallery'
+  'content_type': null
+  'post_content_photos': PostContentPhoto[]
+}
+
+interface PostContentFile extends PostContent {
+  'category': 'file'
+  'content_type': string
+  'download_uri': string
+  'filename': string
+  'hls_uri': string
+  'is_converted': boolean
 }
 
 export interface PostData {
@@ -99,7 +114,7 @@ export interface PostData {
   'fanclub': Fanclub
   'tags': []
   'status': 'open'
-  'post_contents': PostContent[]
+  'post_contents': (PostContentPhotoGallery | PostContentFile)[]
   'deadline': string
   'publish_reserved_at': null
   'comments': unknown

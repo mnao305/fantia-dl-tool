@@ -29,6 +29,10 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
         const filename = imgList[i].name + urlToExt(url)
         fileDownload(url, filepath, filename)
       }
+    } else if (postContent.category === 'file') {
+      const url = 'https://fantia.jp/' + postContent.download_uri
+      fileDownload(url, filepath, postContent.filename)
+      await sleep(500)
     }
   }
 }
