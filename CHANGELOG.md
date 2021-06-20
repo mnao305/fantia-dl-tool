@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.2.0...v3.3.0) (2021-06-20)
+
+
+### Features
+
+* 投稿全体DL時のtextカテゴリのダウンロード対応 ([#112](https://www.github.com/mnao305/fantia-dl-tool/issues/112)) ([8671bd7](https://www.github.com/mnao305/fantia-dl-tool/commit/8671bd7b5fa684917920fef3b65c13ca096b3f3a))
+* 投稿全体での画像の一括DL ([#104](https://www.github.com/mnao305/fantia-dl-tool/issues/104)) ([3756807](https://www.github.com/mnao305/fantia-dl-tool/commit/37568074c428a2fbfee2191b4e8d032d8cc0a1ea))
+* 投稿全体一括DL時のファイルのダウンロード対応 ([#111](https://www.github.com/mnao305/fantia-dl-tool/issues/111)) ([1b07be2](https://www.github.com/mnao305/fantia-dl-tool/commit/1b07be211462d2b2ffae9506dea92ff0e9a390f6))
+
+
+### Bug Fixes
+
+* categoryを見るように修正 ([#107](https://www.github.com/mnao305/fantia-dl-tool/issues/107)) ([ce76a84](https://www.github.com/mnao305/fantia-dl-tool/commit/ce76a84d65817441515dcd3a9fac0fc18700d673))
+* sleepの追加 ([#108](https://www.github.com/mnao305/fantia-dl-tool/issues/108)) ([91e688e](https://www.github.com/mnao305/fantia-dl-tool/commit/91e688e6edb7db43bff9dc7296a7e358188fec40))
+
 ## [3.2.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.1.0...v3.2.0) (2021-06-08)
 
 
