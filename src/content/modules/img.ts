@@ -9,7 +9,8 @@ interface ImgPair {
 
 export const getPhotoContents = (data: PostData | Backnumber, contentId: number): PostContentPhoto[] => {
   if ('post_contents' in data) {
-    return data.post_contents.filter(v => v.id === contentId)[0].post_content_photos
+    const content = data.post_contents.filter(v => v.id === contentId)[0]
+    return content.category === 'photo_gallery' ? content.post_content_photos : []
   } else if ('backnumber_contents' in data) {
     return data.backnumber_contents.filter(v => v.id === contentId)[0].post_content_photos
   } else {

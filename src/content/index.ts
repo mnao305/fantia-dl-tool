@@ -93,10 +93,6 @@ main()
 // メッセージ受信で一括ダウンロード
 browser.runtime.onMessage.addListener(async (message, sender) => {
   if (message.text === 'download_everything_from_a_post') {
-    // TODO: 投稿全体のダウンロードをする
     await downloadEverythingFromPost()
-    console.log('Yeah!!!')
-    console.log(message)
-
   }
 })
