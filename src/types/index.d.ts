@@ -81,6 +81,13 @@ interface PostContentFile extends PostContent {
   'is_converted': boolean
 }
 
+interface PostContentText extends PostContent {
+  'category': 'text'
+  'content_type': null
+  'comment': string
+  'filename': string
+}
+
 export interface PostData {
   'id': number
   'title': string
@@ -114,7 +121,7 @@ export interface PostData {
   'fanclub': Fanclub
   'tags': []
   'status': 'open'
-  'post_contents': (PostContentPhotoGallery | PostContentFile)[]
+  'post_contents': (PostContentPhotoGallery | PostContentFile | PostContentText)[]
   'deadline': string
   'publish_reserved_at': null
   'comments': unknown

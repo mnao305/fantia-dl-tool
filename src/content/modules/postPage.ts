@@ -49,6 +49,9 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
         fileDownload(text, filepath, 'text.txt')
       }
       await sleep(500)
+    } else if (postContent.category === 'text') {
+      const text = `data:text/plain;charset=UTF-8,${postContent.comment}`
+      fileDownload(text, filepath, 'text.txt')
     }
   }
 }
