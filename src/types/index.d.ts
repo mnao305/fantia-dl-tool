@@ -47,7 +47,7 @@ interface PostContent {
   'id': number
   'category': string
   'title': null | string
-  'visible_status': string
+  'visible_status': 'visible' | 'catchable' | 'uncatchable'
   'published_state': string
   'comment': null | string
   'embed_api_url': string
@@ -81,10 +81,17 @@ interface PostContentFile extends PostContent {
   'is_converted': boolean
 }
 
+interface PostContentText extends PostContent {
+  'category': 'text'
+  'content_type': null
+  'comment': string
+  'filename': string
+}
+
 export interface PostData {
   'id': number
   'title': string
-  'comment': string
+  'comment': string | null
   'rating': string
   'thumb': {
     thumb: string
@@ -114,7 +121,7 @@ export interface PostData {
   'fanclub': Fanclub
   'tags': []
   'status': 'open'
-  'post_contents': (PostContentPhotoGallery | PostContentFile)[]
+  'post_contents': (PostContentPhotoGallery | PostContentFile | PostContentText)[]
   'deadline': string
   'publish_reserved_at': null
   'comments': unknown

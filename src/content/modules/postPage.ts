@@ -16,10 +16,21 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export const downloadEverythingFromPost = async (): Promise<void> => {
   const data = await fetchPostData()
 
+  const baseFilepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}`
+
+  if (data.comment) {
+    // リード文がある場合
+    const text = `data:text/plain;charset=UTF-8,${data.comment}`
+    fileDownload(text, baseFilepath, 'text.txt')
+  }
+
   // post_contents内をループしてダウンロードしていく
   for (const postContent of data.post_contents) {
+    // 表示できるもの以外はスキップします
+    if (postContent.visible_status !== 'visible') continue
+
     const contentId = postContent.id
-    const filepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
+    const filepath = `${baseFilepath}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
 
     if (postContent.category === 'photo_gallery') {
       const imgList = getImgList(postContent.post_content_photos)
@@ -32,7 +43,15 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
     } else if (postContent.category === 'file') {
       const url = 'https://fantia.jp/' + postContent.download_uri
       fileDownload(url, filepath, postContent.filename)
+      if (postContent.comment) {
+        // 文字がなにか書いてある場合
+        const text = `data:text/plain;charset=UTF-8,${postContent.comment}`
+        fileDownload(text, filepath, 'text.txt')
+      }
       await sleep(500)
+    } else if (postContent.category === 'text') {
+      const text = `data:text/plain;charset=UTF-8,${postContent.comment}`
+      fileDownload(text, filepath, 'text.txt')
     }
   }
 }
