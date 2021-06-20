@@ -16,17 +16,18 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export const downloadEverythingFromPost = async (): Promise<void> => {
   const data = await fetchPostData()
 
+  const baseFilepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}`
+
   if (data.comment) {
     // リード文がある場合
-    const filepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}`
     const text = `data:text/plain;charset=UTF-8,${data.comment}`
-    fileDownload(text, filepath, 'text.txt')
+    fileDownload(text, baseFilepath, 'text.txt')
   }
 
   // post_contents内をループしてダウンロードしていく
   for (const postContent of data.post_contents) {
     const contentId = postContent.id
-    const filepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
+    const filepath = `${baseFilepath}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
 
     if (postContent.category === 'photo_gallery') {
       const imgList = getImgList(postContent.post_content_photos)

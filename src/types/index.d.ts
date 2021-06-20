@@ -84,7 +84,7 @@ interface PostContentFile extends PostContent {
 export interface PostData {
   'id': number
   'title': string
-  'comment': string
+  'comment': string | null
   'rating': string
   'thumb': {
     thumb: string
