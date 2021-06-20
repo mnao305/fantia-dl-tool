@@ -32,6 +32,11 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
     } else if (postContent.category === 'file') {
       const url = 'https://fantia.jp/' + postContent.download_uri
       fileDownload(url, filepath, postContent.filename)
+      if (postContent.comment) {
+        // 文字がなにか書いてある場合
+        const text = `data:text/plain;charset=UTF-8,${postContent.comment}`
+        fileDownload(text, filepath, 'text.txt')
+      }
       await sleep(500)
     }
   }
