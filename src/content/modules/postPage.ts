@@ -26,6 +26,9 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
 
   // post_contents内をループしてダウンロードしていく
   for (const postContent of data.post_contents) {
+    // 表示できるもの以外はスキップします
+    if (postContent.visible_status !== 'visible') continue
+
     const contentId = postContent.id
     const filepath = `${baseFilepath}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
 

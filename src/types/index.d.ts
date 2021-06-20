@@ -47,7 +47,7 @@ interface PostContent {
   'id': number
   'category': string
   'title': null | string
-  'visible_status': string
+  'visible_status': 'visible' | 'catchable' | 'uncatchable'
   'published_state': string
   'comment': null | string
   'embed_api_url': string
