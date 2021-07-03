@@ -24,7 +24,8 @@ export const fileDownload = (url: string, filepath: string, filename: string): v
   const sendData = {
     msg: 'download',
     url: url,
-    filepath: filepath,
+    // ガチャコン絵文字が入るとエラーになるので分割します
+    filepath: filepath.replaceAll('\u200d', ''),
     filename: filename,
   }
   browser.runtime.sendMessage(sendData)
