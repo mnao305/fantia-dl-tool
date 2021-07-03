@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.2](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.3.1...v3.3.2) (2021-07-03)
+
+
+### Bug Fixes
+
+* 結合絵文字がタイトルなどに入っていた場合にエラーになるのを修正 ([#119](https://www.github.com/mnao305/fantia-dl-tool/issues/119)) ([b08d488](https://www.github.com/mnao305/fantia-dl-tool/commit/b08d4885af6f90a04351a5226b6a62f88504ce6f)), closes [#103](https://www.github.com/mnao305/fantia-dl-tool/issues/103)
+
 ### [3.3.1](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.3.0...v3.3.1) (2021-06-27)
 
 
