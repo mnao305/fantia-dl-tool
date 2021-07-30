@@ -23,7 +23,7 @@
   "homepage": "https://github.com/mnao305/webextension-typescript-template#readme",
   "dependencies": {
     "commitizen": "4.2.4",
-    "jszip": "3.6.0",
+    "jszip": "3.7.0",
     "ky": "0.28.5",
     "sanitize-filename": "1.6.3",
     "webextension-polyfill-ts": "0.26.0"
