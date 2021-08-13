@@ -29,8 +29,8 @@
     "webextension-polyfill-ts": "0.26.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "12.1.4",
-    "@commitlint/config-conventional": "12.1.4",
+    "@commitlint/cli": "13.1.0",
+    "@commitlint/config-conventional": "13.1.0",
     "@mnao305/eslint-config": "5.0.0",
     "@types/archiver": "5.1.1",
     "@types/copy-webpack-plugin": "5.0.3",
