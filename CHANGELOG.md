@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.3](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.3.2...v3.3.3) (2021-08-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jszip to v3.7.0 ([#128](https://www.github.com/mnao305/fantia-dl-tool/issues/128)) ([e561752](https://www.github.com/mnao305/fantia-dl-tool/commit/e5617526b1d4ee9767993601c7800dd9ea275a32))
+* **deps:** update dependency jszip to v3.7.1 ([#132](https://www.github.com/mnao305/fantia-dl-tool/issues/132)) ([955ab77](https://www.github.com/mnao305/fantia-dl-tool/commit/955ab7733ae4eb85c6dea67c61e5073ac4b7e6bb))
+* **deps:** update dependency webextension-polyfill-ts to v0.26.0 ([#123](https://www.github.com/mnao305/fantia-dl-tool/issues/123)) ([4918f2e](https://www.github.com/mnao305/fantia-dl-tool/commit/4918f2ef3910277e9a878aa51eee1f4444a526c1))
+
 ### [3.3.2](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.3.1...v3.3.2) (2021-07-03)
 
 
