@@ -88,6 +88,11 @@ interface PostContentText extends PostContent {
   'filename': string
 }
 
+interface PostContentBlog extends PostContent {
+  'category': 'blog'
+  'comment': string
+}
+
 export interface PostData {
   'id': number
   'title': string
@@ -121,7 +126,7 @@ export interface PostData {
   'fanclub': Fanclub
   'tags': []
   'status': 'open'
-  'post_contents': (PostContentPhotoGallery | PostContentFile | PostContentText)[]
+  'post_contents': (PostContentPhotoGallery | PostContentFile | PostContentText | PostContentBlog)[]
   'deadline': string
   'publish_reserved_at': null
   'comments': unknown

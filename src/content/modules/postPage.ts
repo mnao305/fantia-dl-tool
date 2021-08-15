@@ -3,6 +3,7 @@ import { idAndTitlePath, contentIdToTitle, urlToExt } from '../index'
 import { PostData, PostDataResponse } from '../../types/index'
 import { getImgList } from './img'
 import { fileDownload } from './download'
+import { blogDL } from './blog'
 
 export const fetchPostData = async (): Promise<PostData> => {
   const id = location.pathname.split('/posts/')[1]
@@ -52,6 +53,8 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
     } else if (postContent.category === 'text') {
       const text = `data:text/plain;charset=UTF-8,${postContent.comment}`
       fileDownload(text, filepath, 'text.txt')
+    } else if (postContent.category === 'blog') {
+      blogDL(postContent, filepath)
     }
   }
 }
