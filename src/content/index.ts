@@ -83,7 +83,7 @@ const main = () => {
   const config = {
     characterData: false,
     childList: true,
-    subtree: true,
+    subtree: true
   }
 
   observer.observe(target, config)

@@ -6,7 +6,7 @@ browser.runtime.onInstalled.addListener(() => {
     type: 'normal',
     id: 'download_everything_from_a_post',
     title: browser.i18n.getMessage('download_everything_from_a_post'),
-    documentUrlPatterns: ['https://fantia.jp/posts/*'],
+    documentUrlPatterns: ['https://fantia.jp/posts/*']
   })
 })
 
@@ -23,7 +23,7 @@ export const download = (url: string, filename: string, filepath: string): void 
     url: url,
     filename: `fantia/${filepath}/${filename}`,
     saveAs: false,
-    conflictAction: 'overwrite',
+    conflictAction: 'overwrite'
   }
 
   browser.downloads.download(options)

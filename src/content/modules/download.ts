@@ -1,6 +1,5 @@
 import { browser } from 'webextension-polyfill-ts'
 
-
 // interface dpwmloadSendData {
 //   msg: 'download',
 //   url: string,
@@ -26,7 +25,7 @@ export const fileDownload = (url: string, filepath: string, filename: string): v
     url: url,
     // ガチャコン絵文字が入るとエラーになるので分割します
     filepath: filepath.replaceAll('\u200d', ''),
-    filename: filename,
+    filename: filename
   }
   browser.runtime.sendMessage(sendData)
 }
