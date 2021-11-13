@@ -30,7 +30,7 @@ export const mimeToExtension = (mime: string): string => {
   const mimeExtension: { [index: string]: string } = {
     'image/jpeg': '.jpg',
     'image/png': '.png',
-    'image/gif': '.gif',
+    'image/gif': '.gif'
   }
   return mimeExtension[mime]
 }
