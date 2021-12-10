@@ -33,7 +33,7 @@ jobs:
           upload_url: ${{ steps.release.outputs.upload_url }}
           asset_path: dist_zip/*.zip
       - name: Upload & release
-        uses: mnao305/chrome-extension-upload@2.1.0
+        uses: mnao305/chrome-extension-upload@2.2.0
         if: ${{ steps.release.outputs.release_created }}
         with:
           file-path: dist_zip/*.zip
