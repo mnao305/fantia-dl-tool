@@ -3,7 +3,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { PostData } from '../types'
 import { Backnumber } from '../types/backnumber'
 import { fetchBacknumberData } from './modules/backnumberPage'
-import { injectBtn } from './modules/dom'
+import { injectGalleryAllDlBtn } from './modules/dom'
 import { fileDownload } from './modules/download'
 import { getImgList, getPhotoContents } from './modules/img'
 import { downloadEverythingFromPost, fetchPostData } from './modules/postPage'
@@ -73,7 +73,7 @@ const main = () => {
         const elId = (mutation.target as HTMLElement).closest('.post-content-inner')?.id
         if (elId) {
           const contentId = elementIdTocontentId(elId)
-          injectBtn((mutation.target as HTMLElement), contentId)
+          injectGalleryAllDlBtn((mutation.target as HTMLElement), contentId)
           observer.disconnect()
         }
       }
