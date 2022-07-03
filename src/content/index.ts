@@ -3,7 +3,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { PostData } from '../types'
 import { Backnumber } from '../types/backnumber'
 import { fetchBacknumberData } from './modules/backnumberPage'
-import { injectBtn } from './modules/dom'
+import { injectGalleryAllDlBtn, injectPageAllContentsDlBtn } from './modules/dom'
 import { fileDownload } from './modules/download'
 import { getImgList, getPhotoContents } from './modules/img'
 import { downloadEverythingFromPost, fetchPostData } from './modules/postPage'
@@ -65,28 +65,27 @@ const elementIdTocontentId = (id: string) => {
 }
 
 const main = () => {
-  const target = document.getElementById('page')
-  if (!target) return
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach(mutation => {
-      if ((mutation.target as HTMLElement).className === 'content-block type-photo-gallery ng-scope') {
-        const elId = (mutation.target as HTMLElement).closest('.post-content-inner')?.id
-        if (elId) {
-          const contentId = elementIdTocontentId(elId)
-          injectBtn((mutation.target as HTMLElement), contentId)
-          observer.disconnect()
-        }
+  /**
+   * ページ読み込み完了後に発火する初期化処理
+   */
+  window.onload = () => {
+    // 投稿ページ全体一括保存ボタン作成
+    const postBtnEl = document.getElementsByClassName('post-btns')
+    if (postBtnEl.length > 0) {
+      injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
+    }
+
+    // ギャラリーの一括保存ボタン作成
+    const galleryElements = document.getElementsByClassName('content-block type-photo-gallery ng-scope')
+    for (let i = 0; i < galleryElements.length; i++) {
+      const element = galleryElements[i] as HTMLElement
+      const elId = element.closest('.post-content-inner')?.id
+      if (elId) {
+        const contentId = elementIdTocontentId(elId)
+        injectGalleryAllDlBtn(element, contentId)
       }
-    })
-  })
-
-  const config = {
-    characterData: false,
-    childList: true,
-    subtree: true
+    }
   }
-
-  observer.observe(target, config)
 }
 main()
 

@@ -1,9 +1,10 @@
 interface FantiaImage {
-  fantiaImage: {
+  fantiaImage?: {
     id: string
     url: string
     'original_url': string
-  }
+  },
+  image?: string
 }
 
 export interface BlogBlock {
