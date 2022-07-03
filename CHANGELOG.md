@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.4.1...v3.5.0) (2022-07-03)
+
+
+### Features
+
+* ページ全体を一括で保存するボタンを配置 ([#254](https://www.github.com/mnao305/fantia-dl-tool/issues/254)) ([6892d12](https://www.github.com/mnao305/fantia-dl-tool/commit/6892d12eed73edcad1b80a1382155ffa00963819))
+
+
+### Bug Fixes
+
+* CI落ちていたのを直す ([#252](https://www.github.com/mnao305/fantia-dl-tool/issues/252)) ([d4def57](https://www.github.com/mnao305/fantia-dl-tool/commit/d4def578435333f5d1c2b2fba1f2607482ece3b3))
+* **deps:** update dependency jszip to v3.10.0 ([#242](https://www.github.com/mnao305/fantia-dl-tool/issues/242)) ([ca3776d](https://www.github.com/mnao305/fantia-dl-tool/commit/ca3776df48a5edb35775cae8cd501137689cda02))
+* **deps:** update dependency jszip to v3.8.0 ([#218](https://www.github.com/mnao305/fantia-dl-tool/issues/218)) ([410bf67](https://www.github.com/mnao305/fantia-dl-tool/commit/410bf673646559767feabf6a3bf62521004b12ff))
+* **deps:** update dependency jszip to v3.9.1 ([#221](https://www.github.com/mnao305/fantia-dl-tool/issues/221)) ([33a17fe](https://www.github.com/mnao305/fantia-dl-tool/commit/33a17fe1ab896c892f58510cc5195ca29648d497))
+* **deps:** update dependency ky to v0.29.0 ([#198](https://www.github.com/mnao305/fantia-dl-tool/issues/198)) ([28ddcdf](https://www.github.com/mnao305/fantia-dl-tool/commit/28ddcdf037d01d783be3ff12cf4e01c063b6147b))
+* **deps:** update dependency ky to v0.30.0 ([#207](https://www.github.com/mnao305/fantia-dl-tool/issues/207)) ([ea05c22](https://www.github.com/mnao305/fantia-dl-tool/commit/ea05c22c75637a2bf25d082ae6d876c6bfae9e7c))
+
 ### [3.4.1](https://www.github.com/mnao305/fantia-dl-tool/compare/v3.4.0...v3.4.1) (2021-11-12)
 
 
