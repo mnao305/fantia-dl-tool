@@ -65,27 +65,43 @@ const elementIdTocontentId = (id: string) => {
 }
 
 const main = () => {
-  /**
-   * ページ読み込み完了後に発火する初期化処理
-   */
-  window.onload = () => {
-    // 投稿ページ全体一括保存ボタン作成
-    const postBtnEl = document.getElementsByClassName('post-btns')
-    if (postBtnEl.length > 0) {
-      injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
-    }
+  const target = document.getElementById('page')
+  if (!target) return
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      // 対象のElementが見つかるまでループ
+      if ((mutation.target as HTMLElement).className === 'content-block type-photo-gallery ng-scope') {
+        // 投稿ページ全体一括保存ボタン作成
+        const postBtnEl = document.getElementsByClassName('post-btns')
+        if (postBtnEl.length > 0) {
+          injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
+        }
 
-    // ギャラリーの一括保存ボタン作成
-    const galleryElements = document.getElementsByClassName('content-block type-photo-gallery ng-scope')
-    for (let i = 0; i < galleryElements.length; i++) {
-      const element = galleryElements[i] as HTMLElement
-      const elId = element.closest('.post-content-inner')?.id
-      if (elId) {
-        const contentId = elementIdTocontentId(elId)
-        injectGalleryAllDlBtn(element, contentId)
+        // ギャラリーの一括保存ボタン作成
+        const galleryElements = document.getElementsByClassName('content-block type-photo-gallery ng-scope')
+        for (let i = 0; i < galleryElements.length; i++) {
+          const element = galleryElements[i] as HTMLElement
+          const elId = element.closest('.post-content-inner')?.id
+          if (elId) {
+            const contentId = elementIdTocontentId(elId)
+            injectGalleryAllDlBtn(element, contentId)
+          }
+        }
+
+        // 対象Elementが見つかりボタンを作成し終わったら終了
+        observer.disconnect()
+        break
       }
     }
+  })
+
+  const config = {
+    characterData: false,
+    childList: true,
+    subtree: true
   }
+
+  observer.observe(target, config)
 }
 main()
 
