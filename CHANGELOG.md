@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.1](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.0...v3.5.1) (2022-07-05)
+
+
+### Bug Fixes
+
+* 保存ボタンが表示されない事があったのを修正 ([#260](https://github.com/mnao305/fantia-dl-tool/issues/260)) ([f61bcd7](https://github.com/mnao305/fantia-dl-tool/commit/f61bcd7499fbf8adafe9e9973621d75eb991b86d))
+
 ## [3.5.0](https://github.com/mnao305/fantia-dl-tool/compare/v3.4.1...v3.5.0) (2022-07-03)
 
 
