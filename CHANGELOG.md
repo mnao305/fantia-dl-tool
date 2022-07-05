@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.2](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.1...v3.5.2) (2022-07-05)
+
+
+### Bug Fixes
+
+* 検索対象のElementのclassNameを変更 ([#263](https://github.com/mnao305/fantia-dl-tool/issues/263)) ([cabbbb3](https://github.com/mnao305/fantia-dl-tool/commit/cabbbb356f0d935f2da7be6144f2f451d0d0bbfe))
+
 ## [3.5.1](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.0...v3.5.1) (2022-07-05)
 
 
