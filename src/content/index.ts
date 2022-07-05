@@ -70,7 +70,7 @@ const main = () => {
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       // 対象のElementが見つかるまでループ
-      if ((mutation.target as HTMLElement).className === 'content-block type-photo-gallery ng-scope') {
+      if ((mutation.target as HTMLElement).className.includes('content-block')) {
         // 投稿ページ全体一括保存ボタン作成
         const postBtnEl = document.getElementsByClassName('post-btns')
         if (postBtnEl.length > 0) {
