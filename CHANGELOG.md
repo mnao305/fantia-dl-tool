@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.3](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.2...v3.5.3) (2022-07-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency ky to v0.31.0 ([#269](https://github.com/mnao305/fantia-dl-tool/issues/269)) ([d425ca2](https://github.com/mnao305/fantia-dl-tool/commit/d425ca2abde9d890ebb4fa08d2d17a3f3ea26d8d))
+
 ## [3.5.2](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.1...v3.5.2) (2022-07-05)
 
 
