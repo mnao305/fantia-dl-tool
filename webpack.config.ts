@@ -1,9 +1,9 @@
 import path from 'path'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
-import { ConfigurationFactory } from 'webpack'
+import { Configuration } from 'webpack'
 import { name, version } from './package.json'
 
-const config: ConfigurationFactory = (_, argv) => {
+const config = (_: any, argv: any): Configuration => {
   return {
     devtool: argv.mode === 'production' ? false : 'inline-source-map',
     context: path.join(__dirname, 'src'),
@@ -30,25 +30,27 @@ const config: ConfigurationFactory = (_, argv) => {
       extensions: ['.ts', '.js']
     },
     plugins: [
-      new CopyWebpackPlugin([
-        { from: 'icons', to: 'icons' },
-        { from: 'popup/index.html', to: 'popup/index.html' },
-        { from: 'popup/style.css', to: 'popup/style.css' },
-        { from: 'options/index.html', to: 'options/index.html' },
-        { from: 'options/style.css', to: 'options/style.css' },
-        {
-          from: 'manifest.json',
-          to: 'manifest.json',
-          transform: (content) => {
-            const jsonContent = JSON.parse(content.toString())
-            jsonContent.version = version
-            jsonContent.name = name
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: 'icons', to: 'icons' },
+          { from: 'popup/index.html', to: 'popup/index.html' },
+          { from: 'popup/style.css', to: 'popup/style.css' },
+          { from: 'options/index.html', to: 'options/index.html' },
+          { from: 'options/style.css', to: 'options/style.css' },
+          {
+            from: 'manifest.json',
+            to: 'manifest.json',
+            transform: (content) => {
+              const jsonContent = JSON.parse(content.toString())
+              jsonContent.version = version
+              jsonContent.name = name
 
-            return JSON.stringify(jsonContent, null, 2)
-          }
-        },
-        { from: '_locales', to: '_locales' }
-      ])
+              return JSON.stringify(jsonContent, null, 2)
+            }
+          },
+          { from: '_locales', to: '_locales' }
+        ]
+      })
     ]
   }
 }
