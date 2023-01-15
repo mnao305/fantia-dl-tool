@@ -42,7 +42,7 @@
     "cz-customizable": "6.9.2",
     "eslint": "7.32.0",
     "eslint-config-standard": "16.0.3",
-    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-import": "2.27.4",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "4.3.1",
     "husky": "7.0.4",
