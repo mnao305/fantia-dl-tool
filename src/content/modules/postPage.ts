@@ -7,7 +7,8 @@ import { blogDL } from './blog'
 
 export const fetchPostData = async (): Promise<PostData> => {
   const id = location.pathname.split('/posts/')[1]
-  const json = await ky.get(`https://fantia.jp/api/v1/posts/${id}`).json<PostDataResponse>()
+  const csrfToken = document.getElementsByName('csrf-token')[0].getAttribute('content') ?? ''
+  const json = await ky.get(`https://fantia.jp/api/v1/posts/${id}`, { headers: { 'x-csrf-token': csrfToken } }).json<PostDataResponse>()
 
   return json.post
 }
