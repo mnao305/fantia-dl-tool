@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.3](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.2...v3.5.3) (2023-02-11)
+
+
+### Bug Fixes
+
+* API呼び出しにTokenが必要になったことに対応 ([#357](https://github.com/mnao305/fantia-dl-tool/issues/357)) ([47b6ace](https://github.com/mnao305/fantia-dl-tool/commit/47b6acead1cf9d50e2b2bfb858bb3c0790b1f88d))
+* **deps:** update dependency commitizen to v4.2.6 ([#329](https://github.com/mnao305/fantia-dl-tool/issues/329)) ([a87ae8d](https://github.com/mnao305/fantia-dl-tool/commit/a87ae8db043adb3d764baa4671708d41c8a323c1))
+* **deps:** update dependency commitizen to v4.3.0 ([#350](https://github.com/mnao305/fantia-dl-tool/issues/350)) ([1169a19](https://github.com/mnao305/fantia-dl-tool/commit/1169a195f64f482a7c1344f8b31e576a6def0d48))
+* **deps:** update dependency jszip to v3.10.1 ([#282](https://github.com/mnao305/fantia-dl-tool/issues/282)) ([6a5d0a3](https://github.com/mnao305/fantia-dl-tool/commit/6a5d0a3fbbd63760c3dcfc8ad4582ca4781d566d))
+* **deps:** update dependency ky to v0.31.0 ([#269](https://github.com/mnao305/fantia-dl-tool/issues/269)) ([d425ca2](https://github.com/mnao305/fantia-dl-tool/commit/d425ca2abde9d890ebb4fa08d2d17a3f3ea26d8d))
+* **deps:** update dependency ky to v0.31.3 ([#292](https://github.com/mnao305/fantia-dl-tool/issues/292)) ([7a7c1ea](https://github.com/mnao305/fantia-dl-tool/commit/7a7c1ea6869551e90ff0c27c67dc4b1af39d31a7))
+* **deps:** update dependency ky to v0.31.4 ([#308](https://github.com/mnao305/fantia-dl-tool/issues/308)) ([31faddf](https://github.com/mnao305/fantia-dl-tool/commit/31faddfda1e2b5ce4ae96e8d092fc0e332b15fa8))
+* **deps:** update dependency ky to v0.32.2 ([#316](https://github.com/mnao305/fantia-dl-tool/issues/316)) ([a62a4c3](https://github.com/mnao305/fantia-dl-tool/commit/a62a4c362190308a8e592d12d0b96e371f52a097))
+* **deps:** update dependency ky to v0.33.0 ([#336](https://github.com/mnao305/fantia-dl-tool/issues/336)) ([e218d7f](https://github.com/mnao305/fantia-dl-tool/commit/e218d7f0c218afcfd5108863649c75155827fc82))
+* **deps:** update dependency ky to v0.33.1 ([#340](https://github.com/mnao305/fantia-dl-tool/issues/340)) ([dc4ff60](https://github.com/mnao305/fantia-dl-tool/commit/dc4ff607eab6b3153fef72740e1dc7dc0ec34cfe))
+* **deps:** update dependency ky to v0.33.2 ([#347](https://github.com/mnao305/fantia-dl-tool/issues/347)) ([66d850d](https://github.com/mnao305/fantia-dl-tool/commit/66d850deb43f157bed9288d176f3d42b0d0199a7))
+* **deps:** update patch dependencies ([#277](https://github.com/mnao305/fantia-dl-tool/issues/277)) ([f4743b3](https://github.com/mnao305/fantia-dl-tool/commit/f4743b308d7936c4a0ab00d94c616d914a7f180f))
+* update webpack to v5 ([#300](https://github.com/mnao305/fantia-dl-tool/issues/300)) ([592014e](https://github.com/mnao305/fantia-dl-tool/commit/592014e7ee4a566308a08059dec359bebd4d3101))
+
 ## [3.5.2](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.1...v3.5.2) (2022-07-05)
 
 
