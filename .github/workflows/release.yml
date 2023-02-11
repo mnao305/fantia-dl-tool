@@ -41,4 +41,5 @@ jobs:
           extension-id: poaolllddjlbbomnohpahbpdlcklkffi
           client-id: ${{ secrets.CLIENT_ID }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
           glob: true
