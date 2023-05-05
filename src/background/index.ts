@@ -1,5 +1,13 @@
 import { browser, Downloads } from 'webextension-polyfill-ts'
 
+/**
+ * 与えられた文字列からunicode制御文字を取り除く
+ */
+const removeControlCharacters = (str: string) => {
+  // eslint-disable-next-line no-control-regex
+  return str.replaceAll(/[\u0000-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '')
+}
+
 // 拡張機能インストール時にコンテキストメニューを設定する
 browser.runtime.onInstalled.addListener(() => {
   browser.contextMenus.create({
@@ -20,8 +28,8 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 
 export const download = (url: string, filename: string, filepath: string): void => {
   const options: Downloads.DownloadOptionsType = {
-    url: url,
-    filename: `fantia/${filepath}/${filename}`,
+    url,
+    filename: `fantia/${removeControlCharacters(filepath)}/${removeControlCharacters(filename)}`,
     saveAs: false,
     conflictAction: 'overwrite'
   }
