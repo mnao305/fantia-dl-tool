@@ -1,6 +1,6 @@
 {
   "name": "fantia-dl-tool",
-  "version": "3.5.3",
+  "version": "3.5.4",
   "description": "Fantiaの投稿のメディアを全て一括でDLするツール",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
