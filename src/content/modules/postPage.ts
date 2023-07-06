@@ -1,14 +1,13 @@
-import ky from 'ky'
 import { idAndTitlePath, contentIdToTitle, urlToExt } from '../index'
 import { PostData, PostDataResponse } from '../../types/index'
 import { getImgList } from './img'
 import { fileDownload } from './download'
 import { blogDL } from './blog'
+import { get } from './api'
 
 export const fetchPostData = async (): Promise<PostData> => {
   const id = location.pathname.split('/posts/')[1]
-  const csrfToken = document.getElementsByName('csrf-token')[0].getAttribute('content') ?? ''
-  const json = await ky.get(`https://fantia.jp/api/v1/posts/${id}`, { headers: { 'x-csrf-token': csrfToken } }).json<PostDataResponse>()
+  const json = await get<PostDataResponse>(`https://fantia.jp/api/v1/posts/${id}`)
 
   return json.post
 }
