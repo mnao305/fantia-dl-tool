@@ -67,16 +67,19 @@ const elementIdTocontentId = (id: string) => {
 const main = () => {
   const target = document.getElementById('page')
   if (!target) return
+
+  let postBtnFlag = false
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
+      // 投稿ページ全体一括保存ボタン作成
+      if (!postBtnFlag && (mutation.target as HTMLElement).className.includes('post-btns')) {
+        const postBtnEl = document.getElementsByClassName('post-btns')
+        injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
+        postBtnFlag = true
+      }
+
       // 対象のElementが見つかるまでループ
       if ((mutation.target as HTMLElement).className.includes('content-block')) {
-        // 投稿ページ全体一括保存ボタン作成
-        const postBtnEl = document.getElementsByClassName('post-btns')
-        if (postBtnEl.length > 0) {
-          injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
-        }
-
         // ギャラリーの一括保存ボタン作成
         const galleryElements = document.getElementsByClassName('content-block type-photo-gallery ng-scope')
         for (let i = 0; i < galleryElements.length; i++) {

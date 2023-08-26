@@ -19,8 +19,15 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
 
   const baseFilepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}`
 
+  if (data.thumb.original) {
+    // サムネイル画像がある場合
+    const ext = data.thumb.original.split('.').at(-1)
+    fileDownload(data.thumb.original, baseFilepath, `thumbnail.${ext}`)
+  }
+
   if (data.comment) {
     // リード文がある場合
+    // TODO: リード文に埋め込まれた画像をダウンロードできるようにblog_commentをパースしてダウンロードできるようにする
     const text = `data:text/plain;charset=UTF-8,${data.comment}`
     fileDownload(text, baseFilepath, 'text.txt')
   }
