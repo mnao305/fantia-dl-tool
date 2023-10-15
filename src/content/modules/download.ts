@@ -19,7 +19,7 @@ import { browser } from 'webextension-polyfill-ts'
 /**
  * backgroundのdownloads.downloadを呼び出します。
  */
-export const fileDownload = (url: string, filepath: string, filename: string): void => {
+export const fileDownload = (url: string, filepath: string, filename: string): Promise<void> => {
   const sendData = {
     msg: 'download',
     url: url,
@@ -27,5 +27,5 @@ export const fileDownload = (url: string, filepath: string, filename: string): v
     filepath: filepath.replaceAll('\u200d', ''),
     filename: filename
   }
-  browser.runtime.sendMessage(sendData)
+  return browser.runtime.sendMessage(sendData)
 }
