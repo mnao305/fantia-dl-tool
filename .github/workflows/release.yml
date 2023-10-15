@@ -15,17 +15,13 @@ jobs:
       # ここからリリース発行後の処理
       - uses: actions/checkout@v3
         if: ${{ steps.release.outputs.release_created }}
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-          registry-url: "https://registry.npmjs.org"
+      - uses: oven-sh/setup-bun@v1
         if: ${{ steps.release.outputs.release_created }}
-      - run: npm ci
+      - run: bun install
         if: ${{ steps.release.outputs.release_created }}
-      - run: npm run build
+      - run: bun run build
         if: ${{ steps.release.outputs.release_created }}
-      - run: npm run zip
+      - run: bun run zip
         if: ${{ steps.release.outputs.release_created }}
       - name: upload asset to release page
         uses: shogo82148/actions-upload-release-asset@v1
