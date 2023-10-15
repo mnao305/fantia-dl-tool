@@ -13,7 +13,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
       # ここからリリース発行後の処理
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
       - uses: oven-sh/setup-bun@v1
         if: ${{ steps.release.outputs.release_created }}
