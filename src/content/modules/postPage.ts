@@ -1,5 +1,5 @@
 import { idAndTitlePath, contentIdToTitle, urlToExt } from '../index'
-import { PostData, PostDataResponse } from '../../types/index'
+import { BlogComment, PostData, PostDataResponse } from '../../types/index'
 import { getImgList } from './img'
 import { fileDownload } from './download'
 import { blogDL } from './blog'
@@ -27,9 +27,31 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
 
   if (data.comment) {
     // リード文がある場合
-    // TODO: リード文に埋め込まれた画像をダウンロードできるようにblog_commentをパースしてダウンロードできるようにする
     const text = `data:text/plain;charset=UTF-8,${data.comment}`
     fileDownload(text, baseFilepath, 'text.txt')
+  }
+
+  // リード文に存在する画像のダウンロード
+  if (data.blog_comment) {
+    try {
+      const blogComment = JSON.parse(data.blog_comment) as BlogComment
+      const ops = blogComment.ops
+      const imgList = ops.flatMap(v =>
+        typeof v.insert === 'object' && v.insert?.image ? v.insert.image : []
+      )
+
+      // NOTE: 外部画像の可能性あり
+      for (let i = 0; i < imgList.length; i++) {
+        if (i % 10 === 0) await sleep(500)
+        const url = imgList[i]
+        const filename = `image${i}${urlToExt(url)}`
+        fileDownload(url, baseFilepath, filename).catch(e => {
+          console.error(e)
+        })
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   // post_contents内をループしてダウンロードしていく

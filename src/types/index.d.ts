@@ -98,7 +98,7 @@ export interface PostData {
   'title': string
   'comment': string | null
   'rating': string
-  'thumb'?: {
+  'thumb': {
     thumb: string
     medium: string
     large: string
@@ -106,7 +106,7 @@ export interface PostData {
     ogp: string
     micro: string
     original: string
-  }
+  } | null
   'thumb_micro': string
   'show_adult_thumb': boolean
   'posted_at': string
@@ -130,7 +130,7 @@ export interface PostData {
   'deadline': string
   'publish_reserved_at': null
   'comments': unknown
-  'blog_comment': ''
+  'blog_comment': string | null
   'comments_reactions': unknown
   'reactions': unknown
   'reaction_types_url': string
@@ -152,4 +152,13 @@ export interface ImgData {
 export interface ImgContents {
   name: string;
   content: Blob;
+}
+
+export interface BlogComment {
+  ops: {
+    insert?: string | {
+      image?: string
+    }
+    attributes?: {}
+  }[]
 }
