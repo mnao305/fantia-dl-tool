@@ -19,7 +19,7 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
 
   const baseFilepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}`
 
-  if (data.thumb.original) {
+  if (data.thumb?.original) {
     // サムネイル画像がある場合
     const ext = data.thumb.original.split('.').at(-1)
     fileDownload(data.thumb.original, baseFilepath, `thumbnail.${ext}`)

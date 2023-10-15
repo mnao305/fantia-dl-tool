@@ -98,7 +98,7 @@ export interface PostData {
   'title': string
   'comment': string | null
   'rating': string
-  'thumb': {
+  'thumb'?: {
     thumb: string
     medium: string
     large: string
