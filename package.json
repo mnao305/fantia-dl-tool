@@ -24,7 +24,7 @@
   "dependencies": {
     "commitizen": "4.3.0",
     "jszip": "3.10.1",
-    "ky": "0.33.3",
+    "ky": "1.0.1",
     "sanitize-filename": "1.6.3",
     "webextension-polyfill-ts": "0.26.0"
   },
