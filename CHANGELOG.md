@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/mnao305/fantia-dl-tool/compare/v3.6.0...v3.7.0) (2023-10-15)
+
+
+### Features
+
+* リード文に埋め込まれた画像をダウンロードできるようにする ([#464](https://github.com/mnao305/fantia-dl-tool/issues/464)) ([2f49011](https://github.com/mnao305/fantia-dl-tool/commit/2f4901167d8fe39150f4b9559ca7231f7a8790ff))
+
+
+### Bug Fixes
+
+* サムネイル画像がない場合にエラーになっていたのを修正 ([#462](https://github.com/mnao305/fantia-dl-tool/issues/462)) ([ac3a0a3](https://github.com/mnao305/fantia-dl-tool/commit/ac3a0a3fee945f53be98cd09e6f1d2f34b29325b))
+
 ## [3.6.0](https://github.com/mnao305/fantia-dl-tool/compare/v3.5.5...v3.6.0) (2023-08-26)
 
 
