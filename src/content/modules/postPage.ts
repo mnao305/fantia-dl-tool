@@ -29,7 +29,6 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
     // リード文がある場合
     const text = `data:text/plain;charset=UTF-8,${data.comment}`
     fileDownload(text, baseFilepath, 'text.txt')
-
   }
 
   // リード文に存在する画像のダウンロード
@@ -38,7 +37,7 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
       const blogComment = JSON.parse(data.blog_comment) as BlogComment
       const ops = blogComment.ops
       const imgList = ops.flatMap(v =>
-        typeof v.insert === "object" && v.insert?.image ? v.insert.image :  []
+        typeof v.insert === 'object' && v.insert?.image ? v.insert.image : []
       )
 
       // NOTE: 外部画像の可能性あり
