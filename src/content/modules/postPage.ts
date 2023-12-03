@@ -50,7 +50,8 @@ export const downloadEverythingFromPost = async (): Promise<void> => {
         })
       }
     } catch (e) {
-      console.error(e)
+      // ! リード文はあるがその中に画像がない場合、JSON形式では無く文字列になるためパースエラーになる
+      console.warn(e)
     }
   }
 
