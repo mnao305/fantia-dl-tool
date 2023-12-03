@@ -5,7 +5,7 @@ import { browser, Downloads } from 'webextension-polyfill-ts'
  */
 const removeControlCharacters = (str: string) => {
   // eslint-disable-next-line no-control-regex
-  return str.replaceAll(/[\u0000-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '')
+  return str.replaceAll(/[\u0000-\u001F\u007F-\u009F\u061C\u200b\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '')
 }
 
 // 拡張機能インストール時にコンテキストメニューを設定する
