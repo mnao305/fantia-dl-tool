@@ -6,6 +6,15 @@
     "message": "Download All"
   },
   "download_everything_from_a_post": {
-    "message": "download everything from a post(β)"
+    "message": "download everything from a post"
+  },
+  "all_file_one_folder" : {
+    "message": "全てのファイルを1つのフォルダに保存する"
+  },
+  "all_file_one_folder_description" : {
+    "message": "このオプションを有効にすると、クリエイター・記事毎にフォルダー分けがされず、1つのフォルダに全てのファイルが保存されます。"
+  },
+  "save": {
+    "message": "Save"
   }
 }
