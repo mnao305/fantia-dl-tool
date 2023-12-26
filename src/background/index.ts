@@ -1,4 +1,5 @@
 import { browser, Downloads } from 'webextension-polyfill-ts'
+import { Settings } from '../options'
 
 /**
  * 与えられた文字列からunicode制御文字を取り除く
@@ -26,10 +27,32 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     .catch(err => { console.error(err) })
 })
 
-export const download = (url: string, filename: string, filepath: string): void => {
+/**
+ * 1つのフォルダに全てのファイルを保存する場合のファイル名を生成する
+ */
+const generateOneFolderFileName = (filepath: string, filename: string) => {
+  const splitFilepath = filepath.split('/')
+  const fanclubName = splitFilepath[0].split('_')[1]
+  const titleName = splitFilepath[1].split('_')[1]
+  return `${fanclubName}_${titleName}_${removeControlCharacters(filename)}`
+}
+
+export const download = async (url: string, filename: string, filepath: string): Promise<void> => {
+  const { allFileOneFolder } = (await browser.storage.local.get({
+    allFileOneFolder: false
+  })) as Settings
+  // 保存先の設定
+  const downloadFilename = allFileOneFolder
+  // 1つのフォルダーに全てのファイルを保存する場合
+    ? generateOneFolderFileName(filepath, filename)
+    //
+    : `${removeControlCharacters(filepath)}/${removeControlCharacters(
+        filename
+      )}`
+
   const options: Downloads.DownloadOptionsType = {
     url,
-    filename: `fantia/${removeControlCharacters(filepath)}/${removeControlCharacters(filename)}`,
+    filename: `fantia/${downloadFilename}`,
     saveAs: false,
     conflictAction: 'overwrite'
   }
