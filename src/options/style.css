@@ -1,0 +1,13 @@
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+input {
+  margin-right: 6px;
+}
+
+#saveMsg {
+  display: none;
+  margin-left: 6px;
+}

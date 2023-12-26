@@ -22,10 +22,10 @@ import { browser } from 'webextension-polyfill-ts'
 export const fileDownload = (url: string, filepath: string, filename: string): Promise<void> => {
   const sendData = {
     msg: 'download',
-    url: url,
+    url,
     // ガチャコン絵文字が入るとエラーになるので分割します
     filepath: filepath.replaceAll('\u200d', ''),
-    filename: filename
+    filename
   }
   return browser.runtime.sendMessage(sendData)
 }
