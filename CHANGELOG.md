@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.1](https://github.com/mnao305/fantia-dl-tool/compare/v3.8.0...v3.8.1) (2024-01-20)
+
+
+### Bug Fixes
+
+* 「Download All」ボタンが表示されない ([#509](https://github.com/mnao305/fantia-dl-tool/issues/509)) ([cdff05f](https://github.com/mnao305/fantia-dl-tool/commit/cdff05fdb49c1d21c252cc76d9fefc171de200f7))
+* **deps:** update dependency ky to v1.2.0 ([#504](https://github.com/mnao305/fantia-dl-tool/issues/504)) ([40548b2](https://github.com/mnao305/fantia-dl-tool/commit/40548b2a58edc9b718c4ed6bb8c8d9906eab26e2))
+* 画像ギャラリー形式での一括DLボタンが表示されないのを修正 ([#514](https://github.com/mnao305/fantia-dl-tool/issues/514)) ([c1bb847](https://github.com/mnao305/fantia-dl-tool/commit/c1bb8478957a24dffc5e75b827ee15bcf0495aa0))
+
 ## [3.8.0](https://github.com/mnao305/fantia-dl-tool/compare/v3.7.1...v3.8.0) (2023-12-26)
 
 
