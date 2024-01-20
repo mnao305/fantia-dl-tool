@@ -69,32 +69,29 @@ const main = () => {
   if (!target) return
 
   let postBtnFlag = false
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      // 投稿ページ全体一括保存ボタン作成
-      if (!postBtnFlag && document.getElementsByClassName('post-btns').length > 0) {
-        const postBtnEl = document.getElementsByClassName('post-btns')
-        injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
-        postBtnFlag = true
-      }
+  const observer = new MutationObserver(() => {
+    // 投稿ページ全体一括保存ボタン作成
+    if (!postBtnFlag && document.getElementsByClassName('post-btns').length > 0) {
+      const postBtnEl = document.getElementsByClassName('post-btns')
+      injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
+      postBtnFlag = true
+    }
 
-      // 対象のElementが見つかるまでループ
-      if ((mutation.target as HTMLElement).className.includes('content-block')) {
-        // ギャラリーの一括保存ボタン作成
-        const galleryElements = document.getElementsByClassName('content-block type-photo-gallery ng-scope')
-        for (let i = 0; i < galleryElements.length; i++) {
-          const element = galleryElements[i] as HTMLElement
-          const elId = element.closest('.post-content-inner')?.id
-          if (elId) {
-            const contentId = elementIdTocontentId(elId)
-            injectGalleryAllDlBtn(element, contentId)
-          }
+    // 対象のElementが見つかるまでループ
+    if (document.getElementsByClassName('content-block').length > 0) {
+      // ギャラリーの一括保存ボタン作成
+      const galleryElements = document.getElementsByClassName('content-block type-photo-gallery')
+      for (let i = 0; i < galleryElements.length; i++) {
+        const element = galleryElements[i] as HTMLElement
+        const elId = element.closest('.post-content-inner')?.id
+        if (elId) {
+          const contentId = elementIdTocontentId(elId)
+          injectGalleryAllDlBtn(element, contentId)
         }
-
-        // 対象Elementが見つかりボタンを作成し終わったら終了
-        observer.disconnect()
-        break
       }
+
+      // 対象Elementが見つかりボタンを作成し終わったら終了
+      observer.disconnect()
     }
   })
 
