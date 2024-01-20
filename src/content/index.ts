@@ -72,7 +72,7 @@ const main = () => {
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       // 投稿ページ全体一括保存ボタン作成
-      if (!postBtnFlag && (mutation.target as HTMLElement).className.includes('post-btns')) {
+      if (!postBtnFlag && document.getElementsByClassName('post-btns').length > 0) {
         const postBtnEl = document.getElementsByClassName('post-btns')
         injectPageAllContentsDlBtn((postBtnEl[0] as HTMLElement))
         postBtnFlag = true
