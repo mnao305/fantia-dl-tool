@@ -29,8 +29,8 @@
     "webextension-polyfill-ts": "0.26.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "18.6.0",
-    "@commitlint/config-conventional": "18.6.0",
+    "@commitlint/cli": "18.6.1",
+    "@commitlint/config-conventional": "18.6.2",
     "@types/archiver": "6.0.2",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/webpack": "5.28.5",
@@ -51,7 +51,7 @@
     "ts-loader": "9.5.1",
     "ts-node": "10.9.2",
     "typescript": "5.3.3",
-    "webpack": "5.90.1",
+    "webpack": "5.90.2",
     "webpack-cli": "5.1.4"
   }
 }
