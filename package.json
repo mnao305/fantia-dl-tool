@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "18.6.1",
-    "@commitlint/config-conventional": "18.6.2",
+    "@commitlint/config-conventional": "18.6.3",
     "@types/archiver": "6.0.2",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/webpack": "5.28.5",
