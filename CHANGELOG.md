@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.2](https://github.com/mnao305/fantia-dl-tool/compare/v3.8.1...v3.8.2) (2024-06-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency ky to v1.2.2 ([#529](https://github.com/mnao305/fantia-dl-tool/issues/529)) ([f744990](https://github.com/mnao305/fantia-dl-tool/commit/f744990026d22456cb2ffaa020412fa3538519b3))
+* **deps:** update dependency ky to v1.2.3 ([#538](https://github.com/mnao305/fantia-dl-tool/issues/538)) ([6a18e92](https://github.com/mnao305/fantia-dl-tool/commit/6a18e925ffe5b20579bf44062994eea3ebeffec0))
+* **deps:** update dependency ky to v1.2.4 ([#544](https://github.com/mnao305/fantia-dl-tool/issues/544)) ([e39fc9f](https://github.com/mnao305/fantia-dl-tool/commit/e39fc9fa28739cedfd775b70d5fa81451da41ef4))
+* **deps:** update dependency ky to v1.3.0 ([#547](https://github.com/mnao305/fantia-dl-tool/issues/547)) ([3b28762](https://github.com/mnao305/fantia-dl-tool/commit/3b287623763014b4e78718d77a6e808de2d5b855))
+* **deps:** update dependency ky to v1.4.0 ([#552](https://github.com/mnao305/fantia-dl-tool/issues/552)) ([3a1f7d1](https://github.com/mnao305/fantia-dl-tool/commit/3a1f7d136e84a31105fee891ba7b38d50d2d4d3a))
+
 ## [3.8.1](https://github.com/mnao305/fantia-dl-tool/compare/v3.8.0...v3.8.1) (2024-01-20)
 
 
