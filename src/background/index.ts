@@ -52,12 +52,15 @@ export const download = async (url: string, filename: string, filepath: string):
 
   const options: Downloads.DownloadOptionsType = {
     url,
-    filename: `fantia/${downloadFilename}`,
+    // スペースは削除
+    filename: `fantia/${downloadFilename}`.replaceAll(' ', '').replaceAll('　', ''),
     saveAs: false,
     conflictAction: 'overwrite'
   }
-
-  browser.downloads.download(options)
+  browser.downloads.download(options).catch((e) => {
+    console.error(e, options)
+  }
+  )
 }
 
 interface DownloadEventMsg {
