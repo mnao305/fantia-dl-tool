@@ -7,7 +7,7 @@ export const blogDL = (postContent: PostContentBlog, filepath: string): void => 
   const json = JSON.parse(postContent.comment) as Blog
   const blog = json.ops
 
-  let blog_text = ""
+  let blogText = ''
 
   for (let i = 0; i < blog.length; i++) {
     const element = blog[i]
@@ -21,12 +21,12 @@ export const blogDL = (postContent: PostContentBlog, filepath: string): void => 
     } else if (typeof element.insert === 'string') {
       // テキスト
       // TODO: リンクなどへの対応。Markdown化するかは検討
-      blog_text += element.insert + "\n"
+      blogText += element.insert + '\n'
     }
   }
 
   // テキストのダウンロード
-  if (blog_text !== "") {
-    fileDownload(`data:text/plain;charset=UTF-8,${blog_text}`, filepath, 'text.txt')
+  if (blogText !== '') {
+    fileDownload(`data:text/plain;charset=UTF-8,${blogText}`, filepath, 'text.txt')
   }
 }
