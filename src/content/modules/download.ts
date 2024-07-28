@@ -23,8 +23,8 @@ export const fileDownload = (url: string, filepath: string, filename: string): P
   const sendData = {
     msg: 'download',
     url,
-    // ガチャコン絵文字が入るとエラーになるので分割します
-    filepath: filepath.replaceAll('\u200d', ''),
+    // ガチャコン絵文字・`~`が入るとエラーになるので置換。
+    filepath: filepath.replaceAll('\u200d', '').replaceAll('~', '～'),
     filename
   }
   return browser.runtime.sendMessage(sendData)
