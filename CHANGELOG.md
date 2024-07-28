@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.10.0](https://github.com/mnao305/fantia-dl-tool/compare/v3.9.0...v3.10.0) (2024-07-28)
+
+
+### Features
+
+* ダウンロードに失敗した場合エラーメッセージを表示するようにした ([9aadfff](https://github.com/mnao305/fantia-dl-tool/commit/9aadfff102776d32accb98c1a9b01488e9b6de97))
+
+
+### Bug Fixes
+
+* **deps:** update dependency ky to v1.5.0 ([#563](https://github.com/mnao305/fantia-dl-tool/issues/563)) ([3be2916](https://github.com/mnao305/fantia-dl-tool/commit/3be2916a760a6618c1d6614aecb8fae9ef167363))
+* 名前に `~` が入っているとダウンロードができない問題を修正 ([2ca4499](https://github.com/mnao305/fantia-dl-tool/commit/2ca4499048c1495e7559e1797ff774cb652475df))
+
 ## [3.9.0](https://github.com/mnao305/fantia-dl-tool/compare/v3.8.1...v3.9.0) (2024-07-07)
 
 
