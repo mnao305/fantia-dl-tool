@@ -59,6 +59,7 @@ export const download = async (url: string, filename: string, filepath: string):
   }
   browser.downloads.download(options).catch((e) => {
     console.error(e, options)
+    alert(`ダウンロードに失敗しました。\n\n${e}\n${options.filename}`)
   }
   )
 }
