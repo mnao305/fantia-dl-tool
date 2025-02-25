@@ -2,7 +2,7 @@
   "name": "",
   "description": "__MSG_description__",
   "version": null,
-  "manifest_version": 2,
+  "manifest_version": 3,
   "default_locale": "en",
   "icons": {
     "48": "icons/icon_48.png",
@@ -20,14 +20,10 @@
     }
   ],
   "background": {
-    "scripts": [
-      "background/index.js"
-    ],
-    "persistent": false
+    "service_worker": "background/index.js"
   },
   "options_ui": {
     "page": "options/index.html",
-    "chrome_style": true,
     "browser_style": true
   },
   "permissions": [
