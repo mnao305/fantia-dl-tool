@@ -2,11 +2,11 @@ import { browser, Downloads } from 'webextension-polyfill-ts'
 import { Settings } from '../options'
 
 /**
- * 与えられた文字列からunicode制御文字を取り除く
+ * 与えられた文字列からunicode制御/書式文字を取り除く
  */
 const removeControlCharacters = (str: string) => {
   // eslint-disable-next-line no-control-regex
-  return str.replaceAll(/[\u0000-\u001F\u007F-\u009F\u061C\u200b\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '')
+  return str.replaceAll(/(?:[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u180E\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]|[\uFE00-\uFE0F])/g, '')
 }
 
 // 拡張機能インストール時にコンテキストメニューを設定する
@@ -34,7 +34,7 @@ const generateOneFolderFileName = (filepath: string, filename: string) => {
   const splitFilepath = filepath.split('/')
   const fanclubName = splitFilepath[0].split('_')[1]
   const titleName = splitFilepath[1].split('_')[1]
-  return `${fanclubName}_${titleName}_${removeControlCharacters(filename)}`
+  return `${fanclubName}_${titleName}_${filename}`
 }
 
 export const download = async (url: string, filename: string, filepath: string): Promise<void> => {
@@ -46,14 +46,13 @@ export const download = async (url: string, filename: string, filepath: string):
   // 1つのフォルダーに全てのファイルを保存する場合
     ? generateOneFolderFileName(filepath, filename)
     //
-    : `${removeControlCharacters(filepath)}/${removeControlCharacters(
-        filename
-      )}`
+    : `${filepath}/${filename}`
+  const normalizedFilename = removeControlCharacters(downloadFilename)
 
   const options: Downloads.DownloadOptionsType = {
     url,
     // スペースは削除
-    filename: `fantia/${downloadFilename}`.replaceAll(' ', '').replaceAll('　', ''),
+    filename: `fantia/${normalizedFilename}`.replaceAll(' ', '').replaceAll('　', ''),
     saveAs: false,
     conflictAction: 'overwrite'
   }
