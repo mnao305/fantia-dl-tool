@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.1](https://github.com/mnao305/fantia-dl-tool/compare/v4.0.0...v4.0.1) (2026-01-16)
+
+
+### Bug Fixes
+
+* ダウンロードファイルパスの生成ロジックの修正 ([#601](https://github.com/mnao305/fantia-dl-tool/issues/601)) ([de4904d](https://github.com/mnao305/fantia-dl-tool/commit/de4904d6c4735c71afaad30a5d6ff9c3f52bc3a3))
+
 ## [4.0.0](https://github.com/mnao305/fantia-dl-tool/compare/v3.10.0...v4.0.0) (2025-02-25)
 
 
