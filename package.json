@@ -38,7 +38,7 @@
     "@typescript-eslint/parser": "6.21.0",
     "ajv": "^8.12.0",
     "archiver": "6.0.2",
-    "copy-webpack-plugin": "11.0.0",
+    "copy-webpack-plugin": "13.0.1",
     "cz-conventional-changelog": "3.3.0",
     "cz-customizable": "7.5.1",
     "eslint": "8.57.1",
