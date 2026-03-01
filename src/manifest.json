@@ -22,6 +22,10 @@
   "background": {
     "service_worker": "background/index.js"
   },
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_title": "Fantia DL Status"
+  },
   "options_ui": {
     "page": "options/index.html",
     "browser_style": true

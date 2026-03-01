@@ -1,16 +1,16 @@
-interface FantiaImage {
+type FantiaImage = {
   fantiaImage?: {
     id: string
     url: string
     'original_url': string
-  },
+  }
   image?: string
 }
 
-export interface BlogBlock {
+export type BlogBlock = {
   insert: string | FantiaImage
 }
 
-export interface Blog {
+export type Blog = {
   ops: BlogBlock[]
 }

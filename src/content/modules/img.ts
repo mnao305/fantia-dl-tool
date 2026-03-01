@@ -2,7 +2,7 @@ import ky from 'ky'
 import { Backnumber } from '../../types/backnumber'
 import { ImgData, PostContentPhoto, PostData } from '../../types/index'
 
-interface ImgPair {
+type ImgPair = {
   name: number
   url: string
 }
@@ -35,7 +35,7 @@ export const mimeToExtension = (mime: string): string => {
   return mimeExtension[mime]
 }
 
-interface ContentPair {
+type ContentPair = {
   name: string
   content: Blob
 }

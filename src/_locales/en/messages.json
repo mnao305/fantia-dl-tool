@@ -8,6 +8,99 @@
   "download_everything_from_a_post": {
     "message": "download everything from a post"
   },
+  "download_status_checking": {
+    "message": "Checking download status..."
+  },
+  "download_status_not_downloaded": {
+    "message": "Not downloaded"
+  },
+  "download_status_downloaded": {
+    "message": "Downloaded"
+  },
+  "download_status_updated_after_download": {
+    "message": "Updated after download"
+  },
+  "download_status_downloading": {
+    "message": "Running batch download..."
+  },
+  "download_status_failed": {
+    "message": "Batch download failed"
+  },
+  "download_status_error": {
+    "message": "Failed to check download status"
+  },
+  "popup_title": {
+    "message": "Download Status"
+  },
+  "popup_current_heading": {
+    "message": "Current Post"
+  },
+  "popup_current_post_id": {
+    "message": "Post ID"
+  },
+  "popup_current_post_title": {
+    "message": "Title"
+  },
+  "popup_current_downloaded_at": {
+    "message": "Last Success"
+  },
+  "popup_current_updated_at": {
+    "message": "Last Updated"
+  },
+  "popup_current_failed_count": {
+    "message": "Failed Files"
+  },
+  "popup_refresh": {
+    "message": "Refresh"
+  },
+  "popup_saved_heading": {
+    "message": "Saved Statuses"
+  },
+  "popup_saved_empty": {
+    "message": "No saved status."
+  },
+  "popup_saved_post_id": {
+    "message": "Post ID"
+  },
+  "popup_saved_status": {
+    "message": "Status"
+  },
+  "popup_saved_last_attempt": {
+    "message": "Last Attempt"
+  },
+  "popup_saved_last_success": {
+    "message": "Last Success"
+  },
+  "popup_current_contents_heading": {
+    "message": "Current Post Contents"
+  },
+  "popup_current_contents_empty": {
+    "message": "No post contents."
+  },
+  "popup_current_contents_id": {
+    "message": "Content ID"
+  },
+  "popup_current_contents_status": {
+    "message": "Status"
+  },
+  "popup_current_contents_last_success": {
+    "message": "Last Success"
+  },
+  "popup_current_contents_info": {
+    "message": "Info"
+  },
+  "popup_open_post_page": {
+    "message": "Open a Fantia post page."
+  },
+  "popup_reload_post_page": {
+    "message": "Reload this tab, then open the popup again."
+  },
+  "popup_status_unavailable": {
+    "message": "Failed to get post status."
+  },
+  "popup_status_no_active_tab": {
+    "message": "No active tab."
+  },
   "all_file_one_folder" : {
     "message": "全てのファイルを1つのフォルダに保存する"
   },

@@ -1,5 +1,37 @@
 import { browser, Downloads } from 'webextension-polyfill-ts'
 import { Settings } from '../options'
+import {
+  markPostDownloadFailed,
+  markPostDownloadStarted,
+  markPostDownloadSucceeded
+} from '../content/modules/postDownloadState'
+import {
+  markPostContentDownloadFailed,
+  markPostContentDownloadStarted,
+  markPostContentDownloadSucceeded
+} from '../content/modules/postContentDownloadState'
+
+type ActivePostDownloadBatch = {
+  postId: number
+  downloadIds: Set<number>
+  endSignaled: boolean
+  failedCount: number
+}
+
+type ActivePostContentDownloadBatch = {
+  postId: number
+  contentId: number
+  downloadIds: Set<number>
+  endSignaled: boolean
+  failedCount: number
+}
+
+type PostContentBatchKey = string
+
+const activePostDownloadBatches = new Map<number, ActivePostDownloadBatch>()
+const downloadIdToPostIdMap = new Map<number, number>()
+const activePostContentDownloadBatches = new Map<PostContentBatchKey, ActivePostContentDownloadBatch>()
+const downloadIdToPostContentBatchKeyMap = new Map<number, PostContentBatchKey>()
 
 /**
  * 与えられた文字列からunicode制御/書式文字を取り除く
@@ -49,7 +81,237 @@ const generateOneFolderFileName = (filepath: string, filename: string) => {
   return `${fanclubName}_${titleName}_${filename}`
 }
 
-export const download = async (url: string, filename: string, filepath: string): Promise<void> => {
+/**
+ * post-contentバッチ管理用キーを生成します。
+ */
+const postContentBatchKey = (postId: number, contentId: number): PostContentBatchKey => `${postId}_${contentId}`
+
+/**
+ * ダウンロード終端状態を投稿バッチへ反映します。
+ */
+const handlePostDownloadTerminalState = (downloadId: number, state: 'complete' | 'interrupted'): void => {
+  const postId = downloadIdToPostIdMap.get(downloadId)
+  if (postId == null) return
+
+  const batch = activePostDownloadBatches.get(postId)
+  if (!batch) {
+    downloadIdToPostIdMap.delete(downloadId)
+    return
+  }
+
+  if (!batch.downloadIds.has(downloadId)) {
+    downloadIdToPostIdMap.delete(downloadId)
+    return
+  }
+
+  batch.downloadIds.delete(downloadId)
+  downloadIdToPostIdMap.delete(downloadId)
+  if (state === 'interrupted') {
+    batch.failedCount += 1
+  }
+
+  maybeCompletePostDownloadBatch(postId).catch(err => { console.error(err) })
+}
+
+/**
+ * ダウンロード終端状態をpost-contentバッチへ反映します。
+ */
+const handlePostContentDownloadTerminalState = (downloadId: number, state: 'complete' | 'interrupted'): void => {
+  const key = downloadIdToPostContentBatchKeyMap.get(downloadId)
+  if (key == null) return
+
+  const batch = activePostContentDownloadBatches.get(key)
+  if (!batch) {
+    downloadIdToPostContentBatchKeyMap.delete(downloadId)
+    return
+  }
+
+  if (!batch.downloadIds.has(downloadId)) {
+    downloadIdToPostContentBatchKeyMap.delete(downloadId)
+    return
+  }
+
+  batch.downloadIds.delete(downloadId)
+  downloadIdToPostContentBatchKeyMap.delete(downloadId)
+  if (state === 'interrupted') {
+    batch.failedCount += 1
+  }
+
+  maybeCompletePostContentDownloadBatch(key).catch(err => { console.error(err) })
+}
+
+/**
+ * ダウンロード終端状態を全バッチへ反映します。
+ */
+const handleDownloadTerminalState = (downloadId: number, state: 'complete' | 'interrupted'): void => {
+  handlePostDownloadTerminalState(downloadId, state)
+  handlePostContentDownloadTerminalState(downloadId, state)
+}
+
+/**
+ * download作成直後に既に終端済みの場合を補正します。
+ */
+const settleAlreadyCompletedDownload = async (downloadId: number) => {
+  const results = await browser.downloads.search({ id: downloadId })
+  const latest = results[0]
+  if (!latest) return
+
+  if (latest.state === 'complete' || latest.state === 'interrupted') {
+    handleDownloadTerminalState(downloadId, latest.state)
+  }
+}
+
+/**
+ * 投稿/ post-contentバッチにdownloadIdを紐付けます。
+ */
+const registerDownloadId = (postId: number | null, contentId: number | null, downloadId: number): void => {
+  if (postId != null) {
+    const postBatch = activePostDownloadBatches.get(postId)
+    if (postBatch) {
+      postBatch.downloadIds.add(downloadId)
+      downloadIdToPostIdMap.set(downloadId, postId)
+    }
+  }
+
+  if (postId != null && contentId != null) {
+    const key = postContentBatchKey(postId, contentId)
+    const contentBatch = activePostContentDownloadBatches.get(key)
+    if (contentBatch) {
+      contentBatch.downloadIds.add(downloadId)
+      downloadIdToPostContentBatchKeyMap.set(downloadId, key)
+    }
+  }
+
+  settleAlreadyCompletedDownload(downloadId).catch(err => { console.error(err) })
+}
+
+/**
+ * 投稿バッチの失敗件数を加算します。
+ */
+const increasePostDownloadFailure = (postId: number): void => {
+  const batch = activePostDownloadBatches.get(postId)
+  if (!batch) return
+  batch.failedCount += 1
+  maybeCompletePostDownloadBatch(postId).catch(err => { console.error(err) })
+}
+
+/**
+ * post-contentバッチの失敗件数を加算します。
+ */
+const increasePostContentDownloadFailure = (postId: number, contentId: number): void => {
+  const key = postContentBatchKey(postId, contentId)
+  const batch = activePostContentDownloadBatches.get(key)
+  if (!batch) return
+  batch.failedCount += 1
+  maybeCompletePostContentDownloadBatch(key).catch(err => { console.error(err) })
+}
+
+/**
+ * 投稿バッチの完了条件を満たした場合に状態を確定します。
+ */
+const maybeCompletePostDownloadBatch = async (postId: number): Promise<void> => {
+  const batch = activePostDownloadBatches.get(postId)
+  if (!batch) return
+  if (!batch.endSignaled) return
+  if (batch.downloadIds.size > 0) return
+
+  if (batch.failedCount > 0) {
+    await markPostDownloadFailed(postId, batch.failedCount)
+  } else {
+    await markPostDownloadSucceeded(postId)
+  }
+
+  activePostDownloadBatches.delete(postId)
+}
+
+/**
+ * post-contentバッチの完了条件を満たした場合に状態を確定します。
+ */
+const maybeCompletePostContentDownloadBatch = async (key: PostContentBatchKey): Promise<void> => {
+  const batch = activePostContentDownloadBatches.get(key)
+  if (!batch) return
+  if (!batch.endSignaled) return
+  if (batch.downloadIds.size > 0) return
+
+  if (batch.failedCount > 0) {
+    await markPostContentDownloadFailed(batch.postId, batch.contentId, batch.failedCount)
+  } else {
+    await markPostContentDownloadSucceeded(batch.postId, batch.contentId)
+  }
+
+  activePostContentDownloadBatches.delete(key)
+}
+
+/**
+ * 投稿バッチを開始し、状態をDL中へ更新します。
+ */
+const startPostDownloadBatch = async (postId: number): Promise<void> => {
+  const existing = activePostDownloadBatches.get(postId)
+  if (existing) {
+    for (const downloadId of existing.downloadIds) {
+      downloadIdToPostIdMap.delete(downloadId)
+    }
+  }
+
+  activePostDownloadBatches.set(postId, {
+    postId,
+    downloadIds: new Set<number>(),
+    endSignaled: false,
+    failedCount: 0
+  })
+  await markPostDownloadStarted(postId)
+}
+
+/**
+ * 投稿バッチの入力終了を通知します。
+ */
+const endPostDownloadBatch = async (postId: number): Promise<void> => {
+  const batch = activePostDownloadBatches.get(postId)
+  if (!batch) return
+  batch.endSignaled = true
+  await maybeCompletePostDownloadBatch(postId)
+}
+
+/**
+ * post-contentバッチを開始し、状態をDL中へ更新します。
+ */
+const startPostContentDownloadBatch = async (postId: number, contentId: number): Promise<void> => {
+  const key = postContentBatchKey(postId, contentId)
+  const existing = activePostContentDownloadBatches.get(key)
+  if (existing) {
+    for (const downloadId of existing.downloadIds) {
+      downloadIdToPostContentBatchKeyMap.delete(downloadId)
+    }
+  }
+
+  activePostContentDownloadBatches.set(key, {
+    postId,
+    contentId,
+    downloadIds: new Set<number>(),
+    endSignaled: false,
+    failedCount: 0
+  })
+  await markPostContentDownloadStarted(postId, contentId)
+}
+
+/**
+ * post-contentバッチの入力終了を通知します。
+ */
+const endPostContentDownloadBatch = async (postId: number, contentId: number): Promise<void> => {
+  const key = postContentBatchKey(postId, contentId)
+  const batch = activePostContentDownloadBatches.get(key)
+  if (!batch) return
+  batch.endSignaled = true
+  await maybeCompletePostContentDownloadBatch(key)
+}
+
+export const download = async (
+  url: string,
+  filename: string,
+  filepath: string,
+  postId: number | null = null,
+  contentId: number | null = null
+): Promise<void> => {
   const { allFileOneFolder } = (await browser.storage.local.get({
     allFileOneFolder: false
   })) as Settings
@@ -68,22 +330,82 @@ export const download = async (url: string, filename: string, filepath: string):
     saveAs: false,
     conflictAction: 'overwrite'
   }
-  browser.downloads.download(options).catch((e) => {
+  try {
+    const downloadId = await browser.downloads.download(options)
+    if (downloadId != null) {
+      registerDownloadId(postId, contentId, downloadId)
+    }
+  } catch (e) {
+    if (postId != null) {
+      increasePostDownloadFailure(postId)
+    }
+    if (postId != null && contentId != null) {
+      increasePostContentDownloadFailure(postId, contentId)
+    }
     console.error(e, options)
     alert(`ダウンロードに失敗しました。\n\n${e}\n${options.filename}`)
   }
-  )
 }
 
-interface DownloadEventMsg {
+type DownloadEventMsg = {
   msg: 'download'
   url: string
   filepath: string
   filename: string
+  postId: number | null
+  contentId: number | null
 }
 
-browser.runtime.onMessage.addListener((msg: DownloadEventMsg) => {
+type PostDownloadBatchStartEventMsg = {
+  msg: 'post_download_batch_start'
+  postId: number
+}
+
+type PostDownloadBatchEndEventMsg = {
+  msg: 'post_download_batch_end'
+  postId: number
+}
+
+type PostContentDownloadBatchStartEventMsg = {
+  msg: 'post_content_download_batch_start'
+  postId: number
+  contentId: number
+}
+
+type PostContentDownloadBatchEndEventMsg = {
+  msg: 'post_content_download_batch_end'
+  postId: number
+  contentId: number
+}
+
+type RuntimeMessage =
+  | DownloadEventMsg
+  | PostDownloadBatchStartEventMsg
+  | PostDownloadBatchEndEventMsg
+  | PostContentDownloadBatchStartEventMsg
+  | PostContentDownloadBatchEndEventMsg
+
+browser.downloads.onChanged.addListener((delta) => {
+  if (delta.id == null || delta.state?.current == null) return
+  if (delta.state.current !== 'complete' && delta.state.current !== 'interrupted') return
+
+  handleDownloadTerminalState(delta.id, delta.state.current)
+})
+
+browser.runtime.onMessage.addListener((msg: RuntimeMessage) => {
   if (msg.msg === 'download') {
-    download(msg.url, msg.filename, msg.filepath)
+    return download(msg.url, msg.filename, msg.filepath, msg.postId, msg.contentId)
+  }
+  if (msg.msg === 'post_download_batch_start') {
+    return startPostDownloadBatch(msg.postId)
+  }
+  if (msg.msg === 'post_download_batch_end') {
+    return endPostDownloadBatch(msg.postId)
+  }
+  if (msg.msg === 'post_content_download_batch_start') {
+    return startPostContentDownloadBatch(msg.postId, msg.contentId)
+  }
+  if (msg.msg === 'post_content_download_batch_end') {
+    return endPostContentDownloadBatch(msg.postId, msg.contentId)
   }
 })
