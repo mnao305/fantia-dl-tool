@@ -8,8 +8,15 @@ const MIN_PRUNE_COUNT = 20
  * storage保存エラーが容量超過に起因するかを判定します。
  */
 const isQuotaExceededError = (error: unknown): boolean => {
-  if (!(error instanceof Error)) return false
-  return /quota|QUOTA_BYTES|exceeded/i.test(error.message)
+  if (!error || typeof error !== 'object') return false
+
+  const maybeError = error as { message?: unknown, name?: unknown }
+  const message = typeof maybeError.message === 'string' ? maybeError.message : ''
+  const name = typeof maybeError.name === 'string' ? maybeError.name : ''
+  const text = `${name} ${message}`.trim()
+
+  if (text === '') return false
+  return /quota|QUOTA_BYTES|exceeded/i.test(text)
 }
 
 /**

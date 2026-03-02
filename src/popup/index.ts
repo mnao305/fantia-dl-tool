@@ -177,6 +177,15 @@ const formatDateTime = (value: string | null): string => {
 }
 
 /**
+ * ISO文字列をミリ秒へ変換します。無効値は0を返します。
+ */
+const parseDateMs = (value: string | null): number => {
+  if (!value) return 0
+  const ms = new Date(value).getTime()
+  return Number.isNaN(ms) ? 0 : ms
+}
+
+/**
  * 受信側未接続のruntimeエラーかを判定します。
  */
 const isReceivingEndMissingError = (value: unknown): boolean => {
@@ -378,8 +387,8 @@ const getSavedStatusList = async (): Promise<SavedStatusView[]> => {
     })
 
   records.sort((a, b) => {
-    const aTime = a.lastAttemptAt ? new Date(a.lastAttemptAt).getTime() : 0
-    const bTime = b.lastAttemptAt ? new Date(b.lastAttemptAt).getTime() : 0
+    const aTime = parseDateMs(a.lastAttemptAt)
+    const bTime = parseDateMs(b.lastAttemptAt)
     return bTime - aTime
   })
   return records

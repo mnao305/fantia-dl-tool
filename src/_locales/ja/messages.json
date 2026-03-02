@@ -32,6 +32,9 @@
   "popup_title": {
     "message": "DLステータス"
   },
+  "action_default_title": {
+    "message": "Fantia DL Status"
+  },
   "popup_current_heading": {
     "message": "現在の投稿"
   },

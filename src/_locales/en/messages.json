@@ -32,6 +32,9 @@
   "popup_title": {
     "message": "Download Status"
   },
+  "action_default_title": {
+    "message": "Fantia DL Status"
+  },
   "popup_current_heading": {
     "message": "Current Post"
   },

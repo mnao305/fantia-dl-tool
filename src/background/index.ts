@@ -16,6 +16,7 @@ type ActivePostDownloadBatch = {
   downloadIds: Set<number>
   endSignaled: boolean
   failedCount: number
+  lastActivityAt: string
 }
 
 type ActivePostContentDownloadBatch = {
@@ -24,14 +25,37 @@ type ActivePostContentDownloadBatch = {
   downloadIds: Set<number>
   endSignaled: boolean
   failedCount: number
+  lastActivityAt: string
 }
 
 type PostContentBatchKey = string
+
+type PersistedActivePostDownloadBatch = {
+  postId: number
+  downloadIds: number[]
+  endSignaled: boolean
+  failedCount: number
+  lastActivityAt: string
+}
+
+type PersistedActivePostContentDownloadBatch = {
+  postId: number
+  contentId: number
+  downloadIds: number[]
+  endSignaled: boolean
+  failedCount: number
+  lastActivityAt: string
+}
 
 const activePostDownloadBatches = new Map<number, ActivePostDownloadBatch>()
 const downloadIdToPostIdMap = new Map<number, number>()
 const activePostContentDownloadBatches = new Map<PostContentBatchKey, ActivePostContentDownloadBatch>()
 const downloadIdToPostContentBatchKeyMap = new Map<number, PostContentBatchKey>()
+const postDownloadBatchFinalizeTimers = new Map<number, ReturnType<typeof setTimeout>>()
+const postContentDownloadBatchFinalizeTimers = new Map<PostContentBatchKey, ReturnType<typeof setTimeout>>()
+const ACTIVE_POST_DOWNLOAD_BATCHES_STORAGE_KEY = 'activePostDownloadBatches'
+const ACTIVE_POST_CONTENT_DOWNLOAD_BATCHES_STORAGE_KEY = 'activePostContentDownloadBatches'
+const BATCH_INACTIVITY_TIMEOUT_MS = 20 * 1000
 
 /**
  * 与えられた文字列からunicode制御/書式文字を取り除く
@@ -87,6 +111,226 @@ const generateOneFolderFileName = (filepath: string, filename: string) => {
 const postContentBatchKey = (postId: number, contentId: number): PostContentBatchKey => `${postId}_${contentId}`
 
 /**
+ * 現在時刻をISO文字列で返します。
+ */
+const nowIsoString = (): string => new Date().toISOString()
+
+/**
+ * 日時文字列をミリ秒へ変換します。
+ */
+const parseDateMs = (value: string): number | null => {
+  const ms = new Date(value).getTime()
+  return Number.isNaN(ms) ? null : ms
+}
+
+/**
+ * バッチが一定時間アクティビティなしで放置されているかを判定します。
+ */
+const isBatchInactive = (lastActivityAt: string): boolean => {
+  const lastActivityMs = parseDateMs(lastActivityAt)
+  if (lastActivityMs == null) return true
+  return Date.now() - lastActivityMs >= BATCH_INACTIVITY_TIMEOUT_MS
+}
+
+/**
+ * 値が数値配列かを判定します。
+ */
+const isNumberArray = (value: unknown): value is number[] => {
+  return Array.isArray(value) && value.every(v => typeof v === 'number')
+}
+
+/**
+ * 永続化された投稿バッチ形式かを判定します。
+ */
+const isPersistedActivePostDownloadBatch = (value: unknown): value is PersistedActivePostDownloadBatch => {
+  if (typeof value !== 'object' || value == null) return false
+  const record = value as Record<string, unknown>
+
+  return (
+    typeof record.postId === 'number' &&
+    isNumberArray(record.downloadIds) &&
+    typeof record.endSignaled === 'boolean' &&
+    typeof record.failedCount === 'number' &&
+    typeof record.lastActivityAt === 'string'
+  )
+}
+
+/**
+ * 永続化されたpost-contentバッチ形式かを判定します。
+ */
+const isPersistedActivePostContentDownloadBatch = (value: unknown): value is PersistedActivePostContentDownloadBatch => {
+  if (typeof value !== 'object' || value == null) return false
+  const record = value as Record<string, unknown>
+
+  return (
+    typeof record.postId === 'number' &&
+    typeof record.contentId === 'number' &&
+    isNumberArray(record.downloadIds) &&
+    typeof record.endSignaled === 'boolean' &&
+    typeof record.failedCount === 'number' &&
+    typeof record.lastActivityAt === 'string'
+  )
+}
+
+/**
+ * 投稿バッチの最終アクティビティ時刻を更新します。
+ */
+const touchPostDownloadBatch = (batch: ActivePostDownloadBatch): void => {
+  batch.lastActivityAt = nowIsoString()
+}
+
+/**
+ * post-contentバッチの最終アクティビティ時刻を更新します。
+ */
+const touchPostContentDownloadBatch = (batch: ActivePostContentDownloadBatch): void => {
+  batch.lastActivityAt = nowIsoString()
+}
+
+/**
+ * 投稿バッチ関連のdownloadId逆引きを削除します。
+ */
+const clearPostDownloadBatchMappings = (batch: ActivePostDownloadBatch): void => {
+  for (const downloadId of batch.downloadIds) {
+    downloadIdToPostIdMap.delete(downloadId)
+  }
+}
+
+/**
+ * post-contentバッチ関連のdownloadId逆引きを削除します。
+ */
+const clearPostContentDownloadBatchMappings = (batch: ActivePostContentDownloadBatch): void => {
+  for (const downloadId of batch.downloadIds) {
+    downloadIdToPostContentBatchKeyMap.delete(downloadId)
+  }
+}
+
+/**
+ * アクティブバッチをstorage.localへ永続化します。
+ */
+const persistActiveBatches = async (): Promise<void> => {
+  const postBatches: PersistedActivePostDownloadBatch[] = [...activePostDownloadBatches.values()].map(batch => ({
+    postId: batch.postId,
+    downloadIds: [...batch.downloadIds],
+    endSignaled: batch.endSignaled,
+    failedCount: batch.failedCount,
+    lastActivityAt: batch.lastActivityAt
+  }))
+  const postContentBatches: PersistedActivePostContentDownloadBatch[] = [...activePostContentDownloadBatches.values()].map(batch => ({
+    postId: batch.postId,
+    contentId: batch.contentId,
+    downloadIds: [...batch.downloadIds],
+    endSignaled: batch.endSignaled,
+    failedCount: batch.failedCount,
+    lastActivityAt: batch.lastActivityAt
+  }))
+
+  await browser.storage.local.set({
+    [ACTIVE_POST_DOWNLOAD_BATCHES_STORAGE_KEY]: postBatches,
+    [ACTIVE_POST_CONTENT_DOWNLOAD_BATCHES_STORAGE_KEY]: postContentBatches
+  })
+}
+
+/**
+ * 永続化済みアクティブバッチを読み出してメモリへ復元します。
+ */
+const restoreActiveBatches = async (): Promise<void> => {
+  const storage = await browser.storage.local.get({
+    [ACTIVE_POST_DOWNLOAD_BATCHES_STORAGE_KEY]: [],
+    [ACTIVE_POST_CONTENT_DOWNLOAD_BATCHES_STORAGE_KEY]: []
+  }) as Record<string, unknown>
+
+  const rawPostBatches = storage[ACTIVE_POST_DOWNLOAD_BATCHES_STORAGE_KEY]
+  const rawPostContentBatches = storage[ACTIVE_POST_CONTENT_DOWNLOAD_BATCHES_STORAGE_KEY]
+
+  activePostDownloadBatches.clear()
+  activePostContentDownloadBatches.clear()
+  downloadIdToPostIdMap.clear()
+  downloadIdToPostContentBatchKeyMap.clear()
+
+  if (Array.isArray(rawPostBatches)) {
+    for (const value of rawPostBatches) {
+      if (!isPersistedActivePostDownloadBatch(value)) continue
+
+      const batch: ActivePostDownloadBatch = {
+        postId: value.postId,
+        downloadIds: new Set(value.downloadIds),
+        endSignaled: value.endSignaled,
+        failedCount: value.failedCount,
+        lastActivityAt: value.lastActivityAt
+      }
+      activePostDownloadBatches.set(batch.postId, batch)
+      for (const downloadId of batch.downloadIds) {
+        downloadIdToPostIdMap.set(downloadId, batch.postId)
+      }
+    }
+  }
+
+  if (Array.isArray(rawPostContentBatches)) {
+    for (const value of rawPostContentBatches) {
+      if (!isPersistedActivePostContentDownloadBatch(value)) continue
+
+      const key = postContentBatchKey(value.postId, value.contentId)
+      const batch: ActivePostContentDownloadBatch = {
+        postId: value.postId,
+        contentId: value.contentId,
+        downloadIds: new Set(value.downloadIds),
+        endSignaled: value.endSignaled,
+        failedCount: value.failedCount,
+        lastActivityAt: value.lastActivityAt
+      }
+      activePostContentDownloadBatches.set(key, batch)
+      for (const downloadId of batch.downloadIds) {
+        downloadIdToPostContentBatchKeyMap.set(downloadId, key)
+      }
+    }
+  }
+}
+
+/**
+ * 投稿バッチの遅延確定タイマーを解除します。
+ */
+const clearPostDownloadBatchFinalizeTimer = (postId: number): void => {
+  const timerId = postDownloadBatchFinalizeTimers.get(postId)
+  if (timerId == null) return
+  clearTimeout(timerId)
+  postDownloadBatchFinalizeTimers.delete(postId)
+}
+
+/**
+ * post-contentバッチの遅延確定タイマーを解除します。
+ */
+const clearPostContentDownloadBatchFinalizeTimer = (key: PostContentBatchKey): void => {
+  const timerId = postContentDownloadBatchFinalizeTimers.get(key)
+  if (timerId == null) return
+  clearTimeout(timerId)
+  postContentDownloadBatchFinalizeTimers.delete(key)
+}
+
+/**
+ * 投稿バッチの遅延確定タイマーを設定します。
+ */
+const schedulePostDownloadBatchAutoFinalize = (postId: number): void => {
+  clearPostDownloadBatchFinalizeTimer(postId)
+  const timerId = setTimeout(() => {
+    postDownloadBatchFinalizeTimers.delete(postId)
+    maybeCompletePostDownloadBatch(postId).catch(err => { console.error(err) })
+  }, BATCH_INACTIVITY_TIMEOUT_MS + 100)
+  postDownloadBatchFinalizeTimers.set(postId, timerId)
+}
+
+/**
+ * post-contentバッチの遅延確定タイマーを設定します。
+ */
+const schedulePostContentDownloadBatchAutoFinalize = (key: PostContentBatchKey): void => {
+  clearPostContentDownloadBatchFinalizeTimer(key)
+  const timerId = setTimeout(() => {
+    postContentDownloadBatchFinalizeTimers.delete(key)
+    maybeCompletePostContentDownloadBatch(key).catch(err => { console.error(err) })
+  }, BATCH_INACTIVITY_TIMEOUT_MS + 100)
+  postContentDownloadBatchFinalizeTimers.set(key, timerId)
+}
+
+/**
  * ダウンロード終端状態を投稿バッチへ反映します。
  */
 const handlePostDownloadTerminalState = (downloadId: number, state: 'complete' | 'interrupted'): void => {
@@ -109,6 +353,8 @@ const handlePostDownloadTerminalState = (downloadId: number, state: 'complete' |
   if (state === 'interrupted') {
     batch.failedCount += 1
   }
+  touchPostDownloadBatch(batch)
+  persistActiveBatches().catch(err => { console.error(err) })
 
   maybeCompletePostDownloadBatch(postId).catch(err => { console.error(err) })
 }
@@ -136,6 +382,8 @@ const handlePostContentDownloadTerminalState = (downloadId: number, state: 'comp
   if (state === 'interrupted') {
     batch.failedCount += 1
   }
+  touchPostContentDownloadBatch(batch)
+  persistActiveBatches().catch(err => { console.error(err) })
 
   maybeCompletePostContentDownloadBatch(key).catch(err => { console.error(err) })
 }
@@ -162,6 +410,17 @@ const settleAlreadyCompletedDownload = async (downloadId: number) => {
 }
 
 /**
+ * 指定downloadIdの終端状態を解決します。
+ */
+const resolveDownloadTerminalState = async (downloadId: number): Promise<'complete' | 'interrupted' | null> => {
+  const results = await browser.downloads.search({ id: downloadId })
+  const latest = results[0]
+  if (!latest) return 'interrupted'
+  if (latest.state === 'complete' || latest.state === 'interrupted') return latest.state
+  return null
+}
+
+/**
  * 投稿/ post-contentバッチにdownloadIdを紐付けます。
  */
 const registerDownloadId = (postId: number | null, contentId: number | null, downloadId: number): void => {
@@ -170,6 +429,8 @@ const registerDownloadId = (postId: number | null, contentId: number | null, dow
     if (postBatch) {
       postBatch.downloadIds.add(downloadId)
       downloadIdToPostIdMap.set(downloadId, postId)
+      touchPostDownloadBatch(postBatch)
+      clearPostDownloadBatchFinalizeTimer(postId)
     }
   }
 
@@ -179,9 +440,12 @@ const registerDownloadId = (postId: number | null, contentId: number | null, dow
     if (contentBatch) {
       contentBatch.downloadIds.add(downloadId)
       downloadIdToPostContentBatchKeyMap.set(downloadId, key)
+      touchPostContentDownloadBatch(contentBatch)
+      clearPostContentDownloadBatchFinalizeTimer(key)
     }
   }
 
+  persistActiveBatches().catch(err => { console.error(err) })
   settleAlreadyCompletedDownload(downloadId).catch(err => { console.error(err) })
 }
 
@@ -192,6 +456,8 @@ const increasePostDownloadFailure = (postId: number): void => {
   const batch = activePostDownloadBatches.get(postId)
   if (!batch) return
   batch.failedCount += 1
+  touchPostDownloadBatch(batch)
+  persistActiveBatches().catch(err => { console.error(err) })
   maybeCompletePostDownloadBatch(postId).catch(err => { console.error(err) })
 }
 
@@ -203,6 +469,8 @@ const increasePostContentDownloadFailure = (postId: number, contentId: number): 
   const batch = activePostContentDownloadBatches.get(key)
   if (!batch) return
   batch.failedCount += 1
+  touchPostContentDownloadBatch(batch)
+  persistActiveBatches().catch(err => { console.error(err) })
   maybeCompletePostContentDownloadBatch(key).catch(err => { console.error(err) })
 }
 
@@ -212,8 +480,11 @@ const increasePostContentDownloadFailure = (postId: number, contentId: number): 
 const maybeCompletePostDownloadBatch = async (postId: number): Promise<void> => {
   const batch = activePostDownloadBatches.get(postId)
   if (!batch) return
-  if (!batch.endSignaled) return
   if (batch.downloadIds.size > 0) return
+  if (!batch.endSignaled && !isBatchInactive(batch.lastActivityAt)) {
+    schedulePostDownloadBatchAutoFinalize(postId)
+    return
+  }
 
   if (batch.failedCount > 0) {
     await markPostDownloadFailed(postId, batch.failedCount)
@@ -221,7 +492,10 @@ const maybeCompletePostDownloadBatch = async (postId: number): Promise<void> => 
     await markPostDownloadSucceeded(postId)
   }
 
+  clearPostDownloadBatchFinalizeTimer(postId)
+  clearPostDownloadBatchMappings(batch)
   activePostDownloadBatches.delete(postId)
+  await persistActiveBatches()
 }
 
 /**
@@ -230,8 +504,11 @@ const maybeCompletePostDownloadBatch = async (postId: number): Promise<void> => 
 const maybeCompletePostContentDownloadBatch = async (key: PostContentBatchKey): Promise<void> => {
   const batch = activePostContentDownloadBatches.get(key)
   if (!batch) return
-  if (!batch.endSignaled) return
   if (batch.downloadIds.size > 0) return
+  if (!batch.endSignaled && !isBatchInactive(batch.lastActivityAt)) {
+    schedulePostContentDownloadBatchAutoFinalize(key)
+    return
+  }
 
   if (batch.failedCount > 0) {
     await markPostContentDownloadFailed(batch.postId, batch.contentId, batch.failedCount)
@@ -239,26 +516,31 @@ const maybeCompletePostContentDownloadBatch = async (key: PostContentBatchKey): 
     await markPostContentDownloadSucceeded(batch.postId, batch.contentId)
   }
 
+  clearPostContentDownloadBatchFinalizeTimer(key)
+  clearPostContentDownloadBatchMappings(batch)
   activePostContentDownloadBatches.delete(key)
+  await persistActiveBatches()
 }
 
 /**
  * 投稿バッチを開始し、状態をDL中へ更新します。
  */
 const startPostDownloadBatch = async (postId: number): Promise<void> => {
+  clearPostDownloadBatchFinalizeTimer(postId)
   const existing = activePostDownloadBatches.get(postId)
   if (existing) {
-    for (const downloadId of existing.downloadIds) {
-      downloadIdToPostIdMap.delete(downloadId)
-    }
+    clearPostDownloadBatchMappings(existing)
   }
 
   activePostDownloadBatches.set(postId, {
     postId,
     downloadIds: new Set<number>(),
     endSignaled: false,
-    failedCount: 0
+    failedCount: 0,
+    lastActivityAt: nowIsoString()
   })
+  schedulePostDownloadBatchAutoFinalize(postId)
+  await persistActiveBatches()
   await markPostDownloadStarted(postId)
 }
 
@@ -269,6 +551,8 @@ const endPostDownloadBatch = async (postId: number): Promise<void> => {
   const batch = activePostDownloadBatches.get(postId)
   if (!batch) return
   batch.endSignaled = true
+  touchPostDownloadBatch(batch)
+  await persistActiveBatches()
   await maybeCompletePostDownloadBatch(postId)
 }
 
@@ -277,11 +561,10 @@ const endPostDownloadBatch = async (postId: number): Promise<void> => {
  */
 const startPostContentDownloadBatch = async (postId: number, contentId: number): Promise<void> => {
   const key = postContentBatchKey(postId, contentId)
+  clearPostContentDownloadBatchFinalizeTimer(key)
   const existing = activePostContentDownloadBatches.get(key)
   if (existing) {
-    for (const downloadId of existing.downloadIds) {
-      downloadIdToPostContentBatchKeyMap.delete(downloadId)
-    }
+    clearPostContentDownloadBatchMappings(existing)
   }
 
   activePostContentDownloadBatches.set(key, {
@@ -289,8 +572,11 @@ const startPostContentDownloadBatch = async (postId: number, contentId: number):
     contentId,
     downloadIds: new Set<number>(),
     endSignaled: false,
-    failedCount: 0
+    failedCount: 0,
+    lastActivityAt: nowIsoString()
   })
+  schedulePostContentDownloadBatchAutoFinalize(key)
+  await persistActiveBatches()
   await markPostContentDownloadStarted(postId, contentId)
 }
 
@@ -302,8 +588,81 @@ const endPostContentDownloadBatch = async (postId: number, contentId: number): P
   const batch = activePostContentDownloadBatches.get(key)
   if (!batch) return
   batch.endSignaled = true
+  touchPostContentDownloadBatch(batch)
+  await persistActiveBatches()
   await maybeCompletePostContentDownloadBatch(key)
 }
+
+/**
+ * 投稿バッチ内downloadIdの状態を照合し、終端済みを取り込みます。
+ */
+const reconcilePostDownloadBatch = async (postId: number): Promise<void> => {
+  const batch = activePostDownloadBatches.get(postId)
+  if (!batch) return
+
+  let changed = false
+  for (const downloadId of [...batch.downloadIds]) {
+    const terminalState = await resolveDownloadTerminalState(downloadId)
+    if (terminalState == null) continue
+
+    batch.downloadIds.delete(downloadId)
+    downloadIdToPostIdMap.delete(downloadId)
+    if (terminalState === 'interrupted') {
+      batch.failedCount += 1
+    }
+    changed = true
+  }
+
+  if (changed) {
+    touchPostDownloadBatch(batch)
+    await persistActiveBatches()
+  }
+  await maybeCompletePostDownloadBatch(postId)
+}
+
+/**
+ * post-contentバッチ内downloadIdの状態を照合し、終端済みを取り込みます。
+ */
+const reconcilePostContentDownloadBatch = async (key: PostContentBatchKey): Promise<void> => {
+  const batch = activePostContentDownloadBatches.get(key)
+  if (!batch) return
+
+  let changed = false
+  for (const downloadId of [...batch.downloadIds]) {
+    const terminalState = await resolveDownloadTerminalState(downloadId)
+    if (terminalState == null) continue
+
+    batch.downloadIds.delete(downloadId)
+    downloadIdToPostContentBatchKeyMap.delete(downloadId)
+    if (terminalState === 'interrupted') {
+      batch.failedCount += 1
+    }
+    changed = true
+  }
+
+  if (changed) {
+    touchPostContentDownloadBatch(batch)
+    await persistActiveBatches()
+  }
+  await maybeCompletePostContentDownloadBatch(key)
+}
+
+/**
+ * 全アクティブバッチを復元・照合し、完了可能なものを確定します。
+ */
+const reconcileActiveBatches = async (): Promise<void> => {
+  for (const postId of [...activePostDownloadBatches.keys()]) {
+    await reconcilePostDownloadBatch(postId)
+  }
+  for (const key of [...activePostContentDownloadBatches.keys()]) {
+    await reconcilePostContentDownloadBatch(key)
+  }
+}
+
+const restoreActiveBatchesPromise = (async () => {
+  await restoreActiveBatches()
+  await reconcileActiveBatches()
+})().catch(err => { console.error(err) })
 
 export const download = async (
   url: string,
@@ -343,7 +702,6 @@ export const download = async (
       increasePostContentDownloadFailure(postId, contentId)
     }
     console.error(e, options)
-    alert(`ダウンロードに失敗しました。\n\n${e}\n${options.filename}`)
   }
 }
 
@@ -387,12 +745,20 @@ type RuntimeMessage =
 
 browser.downloads.onChanged.addListener((delta) => {
   if (delta.id == null || delta.state?.current == null) return
-  if (delta.state.current !== 'complete' && delta.state.current !== 'interrupted') return
+  const downloadId = delta.id
+  const terminalState = delta.state.current
+  if (terminalState !== 'complete' && terminalState !== 'interrupted') return
 
-  handleDownloadTerminalState(delta.id, delta.state.current)
+  restoreActiveBatchesPromise
+    .then(() => {
+      handleDownloadTerminalState(downloadId, terminalState)
+    })
+    .catch(err => { console.error(err) })
 })
 
-browser.runtime.onMessage.addListener((msg: RuntimeMessage) => {
+browser.runtime.onMessage.addListener(async (msg: RuntimeMessage) => {
+  await restoreActiveBatchesPromise
+
   if (msg.msg === 'download') {
     return download(msg.url, msg.filename, msg.filepath, msg.postId, msg.contentId)
   }

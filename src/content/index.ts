@@ -20,7 +20,6 @@ import {
 type PostDownloadStatusLabel = PostDownloadStatus | 'checking' | 'error'
 
 let runPostDownload: null | (() => Promise<void>) = null
-const DOWNLOAD_STATUS_POLL_INTERVAL_MS = 1000
 const DOWNLOAD_STATUS_POLL_TIMEOUT_MS = 5 * 60 * 1000
 
 type PopupPostDownloadStatusResponse =
@@ -168,9 +167,9 @@ const mountPostDownloadStatusLabel = (statusLabel: HTMLSpanElement, postButtons:
 }
 
 /**
- * 指定ミリ秒だけ待機します。
+ * 投稿ステータス保存キーを生成します。
  */
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const postDownloadStateStorageKey = (postId: number): string => `postDownloadState_${postId}`
 
 export const urlToExt = (url: string): string => {
   const matchedFileName = url.match(/^(?:[^:/?#]+:)?(?:\/\/[^/?#]*)?(?:([^?#]*\/)([^/?#]*))?(\?[^#]*)?(?:#.*)?$/) ?? []
@@ -279,16 +278,53 @@ const main = () => {
       }
 
       /**
-       * DL中ステータスが終端状態に遷移するまでポーリングします。
+       * DL中ステータスが終端状態に遷移するまでstorage変更を監視します。
        */
       const waitForPostDownloadToSettle = async (postId: number): Promise<boolean> => {
-        const timeoutAt = Date.now() + DOWNLOAD_STATUS_POLL_TIMEOUT_MS
-        while (Date.now() < timeoutAt) {
-          const status = await resolvePostDownloadAttemptStatus(postId)
-          if (status.status !== 'downloading') return true
-          await sleep(DOWNLOAD_STATUS_POLL_INTERVAL_MS)
-        }
-        return false
+        return await new Promise<boolean>((resolve) => {
+          const storageKey = postDownloadStateStorageKey(postId)
+          let settled = false
+          const timeoutId = setTimeout(() => {
+            cleanup()
+            resolve(false)
+          }, DOWNLOAD_STATUS_POLL_TIMEOUT_MS)
+
+          const cleanup = () => {
+            if (settled) return
+            settled = true
+            clearTimeout(timeoutId)
+            browser.storage.onChanged.removeListener(handleStorageChanged)
+          }
+
+          const checkSettled = async () => {
+            try {
+              const status = await resolvePostDownloadAttemptStatus(postId)
+              if (status.status === 'downloading') return
+              cleanup()
+              resolve(true)
+            } catch (e) {
+              console.error(e)
+              cleanup()
+              resolve(false)
+            }
+          }
+
+          const handleStorageChanged = (
+            changes: Record<string, unknown>,
+            areaName: string
+          ) => {
+            if (areaName !== 'local') return
+            if (!(storageKey in changes)) return
+            checkSettled().catch(e => { console.error(e) })
+          }
+
+          browser.storage.onChanged.addListener(handleStorageChanged)
+          checkSettled().catch(e => {
+            console.error(e)
+            cleanup()
+            resolve(false)
+          })
+        })
       }
 
       /**

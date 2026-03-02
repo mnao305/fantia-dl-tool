@@ -24,7 +24,7 @@
   },
   "action": {
     "default_popup": "popup/index.html",
-    "default_title": "Fantia DL Status"
+    "default_title": "__MSG_action_default_title__"
   },
   "options_ui": {
     "page": "options/index.html",
