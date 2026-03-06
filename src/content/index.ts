@@ -219,8 +219,10 @@ export const saveImages = async (event: MouseEvent): Promise<void> => {
   const downloadTasks: Promise<void>[] = []
 
   if ('post_contents' in data) {
-    await startPostContentDownloadBatch(data.id, Number(contentId))
+    let hasStartedPostContentBatch = false
     try {
+      await startPostContentDownloadBatch(data.id, Number(contentId))
+      hasStartedPostContentBatch = true
       for (let i = 0; i < imgList.length; i++) {
         const url = imgList[i].url
         const filename = imgList[i].name + urlToExt(url)
@@ -228,7 +230,9 @@ export const saveImages = async (event: MouseEvent): Promise<void> => {
       }
       await Promise.allSettled(downloadTasks)
     } finally {
-      await endPostContentDownloadBatch(data.id, Number(contentId))
+      if (hasStartedPostContentBatch) {
+        await endPostContentDownloadBatch(data.id, Number(contentId))
+      }
     }
     return
   }

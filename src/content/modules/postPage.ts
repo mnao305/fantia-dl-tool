@@ -102,10 +102,11 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export const downloadEverythingFromPost = async (postData: PostData | null = null): Promise<void> => {
   const data = postData ?? await fetchPostData()
   const postLevelDownloadTasks: Promise<void>[] = []
-
-  await startPostDownloadBatch(data.id)
+  let hasStartedPostBatch = false
 
   try {
+    await startPostDownloadBatch(data.id)
+    hasStartedPostBatch = true
     const baseFilepath = `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}`
 
     if (data.thumb?.original) {
@@ -150,10 +151,11 @@ export const downloadEverythingFromPost = async (postData: PostData | null = nul
       const contentId = postContent.id
       const filepath = `${baseFilepath}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
       const contentDownloadTasks: Promise<void>[] = []
-
-      await startPostContentDownloadBatch(data.id, contentId)
+      let hasStartedPostContentBatch = false
 
       try {
+        await startPostContentDownloadBatch(data.id, contentId)
+        hasStartedPostContentBatch = true
         if (postContent.category === 'photo_gallery') {
           const imgList = getImgList(postContent.post_content_photos)
           for (let i = 0; i < imgList.length; i++) {
@@ -179,12 +181,16 @@ export const downloadEverythingFromPost = async (postData: PostData | null = nul
         }
         await Promise.allSettled(contentDownloadTasks)
       } finally {
-        await endPostContentDownloadBatch(data.id, contentId)
+        if (hasStartedPostContentBatch) {
+          await endPostContentDownloadBatch(data.id, contentId)
+        }
       }
     }
 
     await Promise.allSettled(postLevelDownloadTasks)
   } finally {
-    await endPostDownloadBatch(data.id)
+    if (hasStartedPostBatch) {
+      await endPostDownloadBatch(data.id)
+    }
   }
 }

@@ -53,6 +53,7 @@ const activePostContentDownloadBatches = new Map<PostContentBatchKey, ActivePost
 const downloadIdToPostContentBatchKeyMap = new Map<number, PostContentBatchKey>()
 const postDownloadBatchFinalizeTimers = new Map<number, ReturnType<typeof setTimeout>>()
 const postContentDownloadBatchFinalizeTimers = new Map<PostContentBatchKey, ReturnType<typeof setTimeout>>()
+let persistActiveBatchesQueue: Promise<void> = Promise.resolve()
 const ACTIVE_POST_DOWNLOAD_BATCHES_STORAGE_KEY = 'activePostDownloadBatches'
 const ACTIVE_POST_CONTENT_DOWNLOAD_BATCHES_STORAGE_KEY = 'activePostContentDownloadBatches'
 const BATCH_INACTIVITY_TIMEOUT_MS = 20 * 1000
@@ -205,9 +206,35 @@ const clearPostContentDownloadBatchMappings = (batch: ActivePostContentDownloadB
 }
 
 /**
- * アクティブバッチをstorage.localへ永続化します。
+ * 投稿バッチ開始処理をロールバックします。
  */
-const persistActiveBatches = async (): Promise<void> => {
+const rollbackPostDownloadBatchStart = async (postId: number): Promise<void> => {
+  const batch = activePostDownloadBatches.get(postId)
+  if (!batch) return
+
+  clearPostDownloadBatchFinalizeTimer(postId)
+  clearPostDownloadBatchMappings(batch)
+  activePostDownloadBatches.delete(postId)
+  await persistActiveBatches()
+}
+
+/**
+ * post-contentバッチ開始処理をロールバックします。
+ */
+const rollbackPostContentDownloadBatchStart = async (key: PostContentBatchKey): Promise<void> => {
+  const batch = activePostContentDownloadBatches.get(key)
+  if (!batch) return
+
+  clearPostContentDownloadBatchFinalizeTimer(key)
+  clearPostContentDownloadBatchMappings(batch)
+  activePostContentDownloadBatches.delete(key)
+  await persistActiveBatches()
+}
+
+/**
+ * 現在のアクティブバッチ状態をstorage.localへ書き込みます。
+ */
+const writeActiveBatchesSnapshot = async (): Promise<void> => {
   const postBatches: PersistedActivePostDownloadBatch[] = [...activePostDownloadBatches.values()].map(batch => ({
     postId: batch.postId,
     downloadIds: [...batch.downloadIds],
@@ -228,6 +255,18 @@ const persistActiveBatches = async (): Promise<void> => {
     [ACTIVE_POST_DOWNLOAD_BATCHES_STORAGE_KEY]: postBatches,
     [ACTIVE_POST_CONTENT_DOWNLOAD_BATCHES_STORAGE_KEY]: postContentBatches
   })
+}
+
+/**
+ * アクティブバッチの永続化を直列化して、古いスナップショットの上書きを防ぎます。
+ */
+const persistActiveBatches = (): Promise<void> => {
+  persistActiveBatchesQueue = persistActiveBatchesQueue
+    .catch(() => undefined)
+    .then(async () => {
+      await writeActiveBatchesSnapshot()
+    })
+  return persistActiveBatchesQueue
 }
 
 /**
@@ -539,9 +578,14 @@ const startPostDownloadBatch = async (postId: number): Promise<void> => {
     failedCount: 0,
     lastActivityAt: nowIsoString()
   })
-  schedulePostDownloadBatchAutoFinalize(postId)
-  await persistActiveBatches()
-  await markPostDownloadStarted(postId)
+  try {
+    schedulePostDownloadBatchAutoFinalize(postId)
+    await persistActiveBatches()
+    await markPostDownloadStarted(postId)
+  } catch (error) {
+    await rollbackPostDownloadBatchStart(postId)
+    throw error
+  }
 }
 
 /**
@@ -575,9 +619,14 @@ const startPostContentDownloadBatch = async (postId: number, contentId: number):
     failedCount: 0,
     lastActivityAt: nowIsoString()
   })
-  schedulePostContentDownloadBatchAutoFinalize(key)
-  await persistActiveBatches()
-  await markPostContentDownloadStarted(postId, contentId)
+  try {
+    schedulePostContentDownloadBatchAutoFinalize(key)
+    await persistActiveBatches()
+    await markPostContentDownloadStarted(postId, contentId)
+  } catch (error) {
+    await rollbackPostContentDownloadBatchStart(key)
+    throw error
+  }
 }
 
 /**

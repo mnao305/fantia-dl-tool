@@ -117,6 +117,13 @@ if (
 }
 
 /**
+ * 値が許可された最終試行状態かを判定します。
+ */
+const isLatestStateStatus = (value: unknown): value is LatestStateRecord['lastAttemptStatus'] => {
+  return value === 'downloading' || value === 'downloaded' || value === 'download_failed'
+}
+
+/**
  * v1形式の保存レコードかを判定します。
  */
 const isLegacyStateRecord = (value: unknown): value is LegacyStateRecord => {
@@ -137,11 +144,12 @@ const isLegacyStateRecord = (value: unknown): value is LegacyStateRecord => {
 const isLatestStateRecord = (value: unknown): value is LatestStateRecord => {
   if (typeof value !== 'object' || value == null) return false
   const record = value as Record<string, unknown>
+  const lastAttemptStatus = record.lastAttemptStatus
 
   return (
     record.version === 2 &&
     typeof record.postId === 'number' &&
-    typeof record.lastAttemptStatus === 'string' &&
+    isLatestStateStatus(lastAttemptStatus) &&
     typeof record.lastAttemptStartedAt === 'string' &&
     (record.lastAttemptFinishedAt == null || typeof record.lastAttemptFinishedAt === 'string') &&
     typeof record.lastFailedCount === 'number' &&

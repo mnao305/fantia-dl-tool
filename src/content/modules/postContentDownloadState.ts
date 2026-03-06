@@ -30,6 +30,13 @@ export type PostContentDownloadStatusResult = {
 }
 
 /**
+ * 値が許可された最終試行状態かを判定します。
+ */
+const isLastAttemptStatus = (value: unknown): value is LastAttemptStatus => {
+  return value === 'downloading' || value === 'downloaded' || value === 'download_failed'
+}
+
+/**
  * 投稿IDとコンテンツIDから保存キーを生成します。
  */
 const storageKey = (postId: number, contentId: number): string => `${STORAGE_KEY_PREFIX}${postId}_${contentId}`
@@ -41,11 +48,12 @@ const isPostContentDownloadStateRecord = (value: unknown): value is PostContentD
   if (typeof value !== 'object' || value == null) return false
 
   const record = value as Record<string, unknown>
+  const lastAttemptStatus = record.lastAttemptStatus
   return (
     record.version === STORAGE_VERSION &&
     typeof record.postId === 'number' &&
     typeof record.contentId === 'number' &&
-    typeof record.lastAttemptStatus === 'string' &&
+    isLastAttemptStatus(lastAttemptStatus) &&
     typeof record.lastAttemptStartedAt === 'string' &&
     (record.lastAttemptFinishedAt == null || typeof record.lastAttemptFinishedAt === 'string') &&
     typeof record.lastFailedCount === 'number' &&
