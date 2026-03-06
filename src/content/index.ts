@@ -20,6 +20,8 @@ import {
 type PostDownloadStatusLabel = PostDownloadStatus | 'checking' | 'error'
 
 let runPostDownload: null | (() => Promise<void>) = null
+let activePostDownloadPromise: Promise<void> | null = null
+const activeContentDownloadPromises = new Map<string, Promise<void>>()
 const DOWNLOAD_STATUS_POLL_TIMEOUT_MS = 5 * 60 * 1000
 
 type PopupPostDownloadStatusResponse =
@@ -171,6 +173,63 @@ const mountPostDownloadStatusLabel = (statusLabel: HTMLSpanElement, postButtons:
  */
 const postDownloadStateStorageKey = (postId: number): string => `postDownloadState_${postId}`
 
+/**
+ * 現在ページ内のpost-content実行キーを生成します。
+ */
+const createContentDownloadExecutionKey = (contentId: string): string => `${location.pathname}:${contentId}`
+
+/**
+ * 投稿全体の一括DLを多重起動させずに実行します。
+ */
+const runPostDownloadExclusively = async (runner: () => Promise<void>): Promise<void> => {
+  if (activePostDownloadPromise) {
+    await activePostDownloadPromise
+    return
+  }
+
+  let promise: Promise<void> | null = null
+  promise = (async () => {
+    try {
+      await runner()
+    } finally {
+      if (activePostDownloadPromise === promise) {
+        activePostDownloadPromise = null
+      }
+    }
+  })()
+
+  activePostDownloadPromise = promise
+  await promise
+}
+
+/**
+ * 同一post-contentのDLを多重起動させずに実行します。
+ */
+const runContentDownloadExclusively = async (
+  executionKey: string,
+  runner: () => Promise<void>
+): Promise<void> => {
+  const activePromise = activeContentDownloadPromises.get(executionKey)
+  if (activePromise) {
+    await activePromise
+    return
+  }
+
+  let promise: Promise<void> | null = null
+  promise = (async () => {
+    try {
+      await runner()
+    } finally {
+      if (activeContentDownloadPromises.get(executionKey) === promise) {
+        activeContentDownloadPromises.delete(executionKey)
+      }
+    }
+  })()
+
+  activeContentDownloadPromises.set(executionKey, promise)
+  await promise
+}
+
 export const urlToExt = (url: string): string => {
   const matchedFileName = url.match(/^(?:[^:/?#]+:)?(?:\/\/[^/?#]*)?(?:([^?#]*\/)([^/?#]*))?(\?[^#]*)?(?:#.*)?$/) ?? []
   const [, , fileName] = matchedFileName.map(match => match ?? '')
@@ -203,46 +262,58 @@ export const contentIdToTitle = (data: PostData | Backnumber, contentId: number)
 }
 
 export const saveImages = async (event: MouseEvent): Promise<void> => {
-  const contentIdAttr = (event.target as HTMLElement).attributes.getNamedItem('content-id')
-  if (!contentIdAttr) return
+  const button = event.currentTarget instanceof HTMLButtonElement
+    ? event.currentTarget
+    : null
+  const contentIdAttr = button?.attributes.getNamedItem('content-id')
+  if (!button || !contentIdAttr) return
   const contentId = contentIdAttr.value
-  const data = /.+\/backnumbers.*/.test(location.href)
-    ? await fetchBacknumberData()
-    : await fetchPostData()
+  const executionKey = createContentDownloadExecutionKey(contentId)
 
-  const filepath = 'post_contents' in data
-    ? `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
-    : `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
-
-  const photoContents = getPhotoContents(data, Number(contentId))
-  const imgList = getImgList(photoContents)
-  const downloadTasks: Promise<void>[] = []
-
-  if ('post_contents' in data) {
-    let hasStartedPostContentBatch = false
+  await runContentDownloadExclusively(executionKey, async () => {
+    button.disabled = true
     try {
-      await startPostContentDownloadBatch(data.id, Number(contentId))
-      hasStartedPostContentBatch = true
+      const data = /.+\/backnumbers.*/.test(location.href)
+        ? await fetchBacknumberData()
+        : await fetchPostData()
+
+      const filepath = 'post_contents' in data
+        ? `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${idAndTitlePath(data.id, data.title)}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
+        : `${idAndTitlePath(data.fanclub.id, data.fanclub.fanclub_name_with_creator_name)}/${backnumberToPostIdAndTitle(data, Number(contentId))}/${idAndTitlePath(contentId, contentIdToTitle(data, Number(contentId)))}`
+
+      const photoContents = getPhotoContents(data, Number(contentId))
+      const imgList = getImgList(photoContents)
+      const downloadTasks: Promise<void>[] = []
+
+      if ('post_contents' in data) {
+        let hasStartedPostContentBatch = false
+        try {
+          await startPostContentDownloadBatch(data.id, Number(contentId))
+          hasStartedPostContentBatch = true
+          for (let i = 0; i < imgList.length; i++) {
+            const url = imgList[i].url
+            const filename = imgList[i].name + urlToExt(url)
+            downloadTasks.push(fileDownload(url, filepath, filename, data.id, Number(contentId)))
+          }
+          await Promise.allSettled(downloadTasks)
+        } finally {
+          if (hasStartedPostContentBatch) {
+            await endPostContentDownloadBatch(data.id, Number(contentId))
+          }
+        }
+        return
+      }
+
       for (let i = 0; i < imgList.length; i++) {
         const url = imgList[i].url
         const filename = imgList[i].name + urlToExt(url)
-        downloadTasks.push(fileDownload(url, filepath, filename, data.id, Number(contentId)))
+        downloadTasks.push(fileDownload(url, filepath, filename))
       }
       await Promise.allSettled(downloadTasks)
     } finally {
-      if (hasStartedPostContentBatch) {
-        await endPostContentDownloadBatch(data.id, Number(contentId))
-      }
+      button.disabled = false
     }
-    return
-  }
-
-  for (let i = 0; i < imgList.length; i++) {
-    const url = imgList[i].url
-    const filename = imgList[i].name + urlToExt(url)
-    downloadTasks.push(fileDownload(url, filepath, filename))
-  }
-  await Promise.allSettled(downloadTasks)
+  })
 }
 
 const elementIdTocontentId = (id: string) => {
@@ -335,25 +406,27 @@ const main = () => {
        * 投稿全体の一括DL実行とステータス更新を行います。
        */
       runPostDownload = async () => {
-        button.disabled = true
-        setPostDownloadStatusLabel(statusLabel, 'downloading')
-        try {
-          const postData = await fetchPostData()
-          await downloadEverythingFromPost(postData)
-          const isSettled = await waitForPostDownloadToSettle(postData.id)
-          if (!isSettled) {
-            setPostDownloadStatusLabel(statusLabel, 'error')
-            return
-          }
+        await runPostDownloadExclusively(async () => {
+          button.disabled = true
+          setPostDownloadStatusLabel(statusLabel, 'downloading')
+          try {
+            const postData = await fetchPostData()
+            await downloadEverythingFromPost(postData)
+            const isSettled = await waitForPostDownloadToSettle(postData.id)
+            if (!isSettled) {
+              setPostDownloadStatusLabel(statusLabel, 'error')
+              return
+            }
 
-          const status = await resolvePostDownloadStatus(postData)
-          setPostDownloadStatusLabel(statusLabel, status.status, status.downloadedAt, status.failedCount)
-        } catch (e) {
-          console.error(e)
-          setPostDownloadStatusLabel(statusLabel, 'error')
-        } finally {
-          button.disabled = false
-        }
+            const status = await resolvePostDownloadStatus(postData)
+            setPostDownloadStatusLabel(statusLabel, status.status, status.downloadedAt, status.failedCount)
+          } catch (e) {
+            console.error(e)
+            setPostDownloadStatusLabel(statusLabel, 'error')
+          } finally {
+            button.disabled = false
+          }
+        })
       }
 
       button.onclick = runPostDownload
@@ -401,7 +474,9 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     if (runPostDownload) {
       await runPostDownload()
     } else {
-      await downloadEverythingFromPost()
+      await runPostDownloadExclusively(async () => {
+        await downloadEverythingFromPost()
+      })
     }
   }
 })
