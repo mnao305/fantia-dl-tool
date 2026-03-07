@@ -1,6 +1,5 @@
 import { browser } from 'webextension-polyfill-ts'
 import { saveImages } from '../index'
-import { downloadEverythingFromPost } from './postPage'
 
 /**
  * ダウンロードアイコンを返す
@@ -42,7 +41,6 @@ const createPageAllContentsDlBtn = (): HTMLButtonElement => {
   btn.innerHTML = `${createDownloadIcon(16)}<span>${browser.i18n.getMessage('download_all')}</span>`
   btn.setAttribute('style', 'margin-left: 5px; border: 1px solid #dddddd; background-color: #ffffff; color: #999999; display: inline-flex; align-items: center;')
   btn.className = 'btn btn-sm'
-  btn.onclick = downloadEverythingFromPost
 
   btn.onmouseover = () => {
     btn.setAttribute('style', 'margin-left: 5px; border: 1px solid #dddddd; background-color: #ffffff; color: #22c283; display: inline-flex; align-items: center;')
@@ -54,10 +52,26 @@ const createPageAllContentsDlBtn = (): HTMLButtonElement => {
   return btn
 }
 
+const createPostDlStatusLabel = (): HTMLSpanElement => {
+  const statusLabel = document.createElement('span')
+  statusLabel.setAttribute('style', 'font-size: 12px; color: #999999; display: inline-flex; align-items: center; white-space: nowrap;')
+  return statusLabel
+}
+
+export type PageAllContentsDlElements = {
+  button: HTMLButtonElement
+  statusLabel: HTMLSpanElement
+}
+
 /**
  * ページコンテンツを全てDLするボタンを配置する
  */
-export const injectPageAllContentsDlBtn = (el: HTMLElement) => {
+export const injectPageAllContentsDlBtn = (el: HTMLElement): PageAllContentsDlElements => {
   const btn = createPageAllContentsDlBtn()
+  const statusLabel = createPostDlStatusLabel()
   el.appendChild(btn)
+  return {
+    button: btn,
+    statusLabel
+  }
 }

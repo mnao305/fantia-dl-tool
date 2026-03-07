@@ -2,12 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>Fantia DL Status</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="app">
-
+    <h1 data-locale="popup_title">DL Status</h1>
+    <section class="panel">
+      <h2 data-locale="popup_current_heading">Current Post</h2>
+      <p id="currentStatusSummary" class="status status-checking" data-locale="download_status_checking">Checking download status...</p>
+      <dl class="meta-list">
+        <div>
+          <dt data-locale="popup_current_post_id">Post ID</dt>
+          <dd id="currentPostId">-</dd>
+        </div>
+        <div>
+          <dt data-locale="popup_current_post_title">Title</dt>
+          <dd id="currentPostTitle">-</dd>
+        </div>
+        <div>
+          <dt data-locale="popup_current_downloaded_at">Last Success</dt>
+          <dd id="currentDownloadedAt">-</dd>
+        </div>
+        <div>
+          <dt data-locale="popup_current_updated_at">Last Updated</dt>
+          <dd id="currentUpdatedAt">-</dd>
+        </div>
+        <div>
+          <dt data-locale="popup_current_failed_count">Failed Files</dt>
+          <dd id="currentFailedCount">-</dd>
+        </div>
+      </dl>
+      <button id="refreshCurrentStatus" class="refresh-btn" data-locale="popup_refresh">Refresh</button>
+    </section>
+    <section class="panel">
+      <h2 data-locale="popup_current_contents_heading">Current Post Contents</h2>
+      <p id="currentContentsEmpty" class="empty" data-locale="popup_current_contents_empty">No post contents.</p>
+      <table id="currentContentsTable" class="saved-table" hidden>
+        <thead>
+          <tr>
+            <th data-locale="popup_current_contents_id">Content ID</th>
+            <th data-locale="popup_current_contents_status">Status</th>
+            <th data-locale="popup_current_contents_last_success">Last Success</th>
+            <th data-locale="popup_current_contents_info">Info</th>
+          </tr>
+        </thead>
+        <tbody id="currentContentsTbody"></tbody>
+      </table>
+    </section>
+    <section class="panel">
+      <h2 data-locale="popup_saved_heading">Saved Statuses</h2>
+      <p id="savedEmpty" class="empty" data-locale="popup_saved_empty">No saved status.</p>
+      <table id="savedTable" class="saved-table" hidden>
+        <thead>
+          <tr>
+            <th data-locale="popup_saved_post_id">Post ID</th>
+            <th data-locale="popup_saved_status">Status</th>
+            <th data-locale="popup_saved_last_attempt">Last Attempt</th>
+            <th data-locale="popup_saved_last_success">Last Success</th>
+          </tr>
+        </thead>
+        <tbody id="savedTbody"></tbody>
+      </table>
+    </section>
   </div>
   <script src="index.js"></script>
 </body>

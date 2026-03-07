@@ -8,6 +8,102 @@
   "download_everything_from_a_post": {
     "message": "この投稿の全てをダウンロード"
   },
+  "download_status_checking": {
+    "message": "DL状態を確認中..."
+  },
+  "download_status_not_downloaded": {
+    "message": "未DL"
+  },
+  "download_status_downloaded": {
+    "message": "DL済み"
+  },
+  "download_status_updated_after_download": {
+    "message": "DL後に更新あり"
+  },
+  "download_status_downloading": {
+    "message": "一括DLを実行中..."
+  },
+  "download_status_failed": {
+    "message": "一括DL失敗"
+  },
+  "download_status_error": {
+    "message": "DL状態の確認に失敗"
+  },
+  "popup_title": {
+    "message": "DLステータス"
+  },
+  "action_default_title": {
+    "message": "Fantia DL Status"
+  },
+  "popup_current_heading": {
+    "message": "現在の投稿"
+  },
+  "popup_current_post_id": {
+    "message": "投稿ID"
+  },
+  "popup_current_post_title": {
+    "message": "タイトル"
+  },
+  "popup_current_downloaded_at": {
+    "message": "最終成功DL"
+  },
+  "popup_current_updated_at": {
+    "message": "最終更新"
+  },
+  "popup_current_failed_count": {
+    "message": "失敗ファイル数"
+  },
+  "popup_refresh": {
+    "message": "再読み込み"
+  },
+  "popup_saved_heading": {
+    "message": "保存済みステータス"
+  },
+  "popup_saved_empty": {
+    "message": "保存済みステータスはありません"
+  },
+  "popup_saved_post_id": {
+    "message": "投稿ID"
+  },
+  "popup_saved_status": {
+    "message": "状態"
+  },
+  "popup_saved_last_attempt": {
+    "message": "最終試行"
+  },
+  "popup_saved_last_success": {
+    "message": "最終成功"
+  },
+  "popup_current_contents_heading": {
+    "message": "現在の投稿コンテンツ"
+  },
+  "popup_current_contents_empty": {
+    "message": "投稿コンテンツはありません"
+  },
+  "popup_current_contents_id": {
+    "message": "コンテンツID"
+  },
+  "popup_current_contents_status": {
+    "message": "状態"
+  },
+  "popup_current_contents_last_success": {
+    "message": "最終成功"
+  },
+  "popup_current_contents_info": {
+    "message": "情報"
+  },
+  "popup_open_post_page": {
+    "message": "Fantiaの投稿ページを開いてください"
+  },
+  "popup_reload_post_page": {
+    "message": "このタブを再読み込みしてから、もう一度開いてください"
+  },
+  "popup_status_unavailable": {
+    "message": "投稿ステータスを取得できません"
+  },
+  "popup_status_no_active_tab": {
+    "message": "アクティブタブが見つかりません"
+  },
   "all_file_one_folder" : {
     "message": "全てのファイルを1つのフォルダに保存する"
   },
