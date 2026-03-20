@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/mnao305/fantia-dl-tool/compare/v4.0.1...v4.1.0) (2026-03-20)
+
+
+### Features
+
+* 投稿DLステータス管理とpopup表示を強化 ([#619](https://github.com/mnao305/fantia-dl-tool/issues/619)) ([afa2e21](https://github.com/mnao305/fantia-dl-tool/commit/afa2e218f9401f565c35a5c9e42d195f8c63be65))
+
+
+### Bug Fixes
+
+* **deps:** update dependency ky to v1.14.2 ([#608](https://github.com/mnao305/fantia-dl-tool/issues/608)) ([4200671](https://github.com/mnao305/fantia-dl-tool/commit/42006719f7feece70c7a7d2638246d10bdec0e95))
+* **deps:** update dependency ky to v1.14.3 ([#612](https://github.com/mnao305/fantia-dl-tool/issues/612)) ([327ed3a](https://github.com/mnao305/fantia-dl-tool/commit/327ed3a296655a018e12de276b25f0cd7a62d3cb))
+
 ## [4.0.1](https://github.com/mnao305/fantia-dl-tool/compare/v4.0.0...v4.0.1) (2026-01-16)
 
 
