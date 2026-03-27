@@ -47,7 +47,7 @@
     "eslint-plugin-n": "^16.2.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "6.6.0",
-    "husky": "8.0.3",
+    "husky": "9.1.7",
     "ts-loader": "9.5.4",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",
