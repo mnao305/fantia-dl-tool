@@ -45,7 +45,7 @@
     "eslint-config-standard": "17.1.0",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-n": "^16.2.0",
-    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-n": "14.0.0",
     "eslint-plugin-promise": "6.6.0",
     "husky": "8.0.3",
     "ts-loader": "9.5.4",
