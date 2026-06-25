@@ -7,15 +7,15 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
       # ここからリリース発行後の処理
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         if: ${{ steps.release.outputs.release_created }}
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@f4d14e03ff726c06358e5557344e1da148b56cf7 # v1
         if: ${{ steps.release.outputs.release_created }}
       - run: bun install
         if: ${{ steps.release.outputs.release_created }}
@@ -24,13 +24,13 @@ jobs:
       - run: bun run zip
         if: ${{ steps.release.outputs.release_created }}
       - name: upload asset to release page
-        uses: shogo82148/actions-upload-release-asset@v1
+        uses: shogo82148/actions-upload-release-asset@394b3c11c3cfc038b5396ad265c074065cf875c3 # v1
         if: ${{ steps.release.outputs.release_created }}
         with:
           upload_url: ${{ steps.release.outputs.upload_url }}
           asset_path: dist_zip/*.zip
       - name: Upload & release
-        uses: mnao305/chrome-extension-upload@v5.0.0
+        uses: mnao305/chrome-extension-upload@4008e29e13c144d0f6725462cbd49b7c291b4928 # v5.0.0
         if: ${{ steps.release.outputs.release_created }}
         with:
           file-path: dist_zip/*.zip
